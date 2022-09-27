@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "eyecandies"
+authors = [
+  { name="Eyecan.ai", email="info@eyecan.ai" },
+]
+description = "Sample code to work with the Eyecandies dataset."
+readme = "README.md"
+license = { text="GNU General Public License v3 (GPLv3)" }
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development",
+]
+keywords = [
+    "eyecandies", "dataset", "anomaly detection", "pipelime"
+]
+dependencies = [
+    "pipelime-python",
+]
+dynamic = [ "version" ]
+
+[tool.hatch.version]
+path = "eyecandies/__init__.py"
