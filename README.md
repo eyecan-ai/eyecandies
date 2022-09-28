@@ -12,16 +12,28 @@ This repository contains sample code to download and use the Eyecandies dataset 
 }
 ```
 
+> **Warning**
+>
+> **This package is just an example on how to use the Eyecandies dataset and it is not meant to reproduce the results in the paper.**
+
 ## Getting Started
 
 Installing the package brings in everything you need to download and use the Eyecandies dataset.
-You can either get it directly from github:
+However, it is better to first create a virtual environment and install `pytorch` following the instructions on the [official website](https://pytorch.org/get-started/locally/). For instance, to get `pytorch` 1.12.1 with `pip` and `venv` on Linux:
+
+```bash
+$ python3 -m venv <venv_path>
+$ source <venv_path>/bin/activate
+$ pip install torch==1.12.1 torchvision --extra-index-url https://download.pytorch.org/whl/cu116
+```
+
+Now you can get Eyecandies either directly from github:
 
 ```bash
 $ pip install git+https://github.com/eyecan-ai/eyecandies.git
 ```
 
-or clone the repository and install it locally:
+or by cloning the repository and installing it locally:
 
 ```bash
 $ git clone https://github.com/eyecan-ai/eyecandies.git
@@ -30,22 +42,21 @@ $ pip install -e eyecandies
 
 This package is built on top of [Pipelime](https://github.com/eyecan-ai/pipelime-python/).
 You can find more information about Pipelime and its features in the [documentation](https://pipelime-python.readthedocs.io).
-
-You can print the available commands in this package with:
+For example, the available *pipelime* commands in this package are listed with:
 
 ```bash
 $ pipelime -m eyecandies list
 ```
 
-And see the help for a specific command. e.g.:
+Then to see the help for a specific command, e.g. `ec-get`:
 
 ```bash
 $ pipelime -m eyecandies help ec-get
 ```
 
-## Dataset Download
+## Download The Dataset
 
-First, you need to download the dataset. You can do it with the following command:
+First, you should download the dataset. You can do it with the following command:
 
 ```bash
 $ pipelime -m eyecandies ec-get [+category <name_0> +category <name_1> ...]  +output <folder>
@@ -53,7 +64,7 @@ $ pipelime -m eyecandies ec-get [+category <name_0> +category <name_1> ...]  +ou
 
 where `folder` is the path to the folder where you want to download the dataset,
 while `name_0`, `name_1`, ... are the names of the categories you want to download.
-Choose among the following, or no one to download the whole dataset:
+Choose among the following, or leave empty to download all categories:
 - Candy Cane
 - Chocolate Cookie
 - Chocolate Praline

@@ -1,0 +1,19 @@
+nodes:
+    train:
+        ec-train:
+            train_dataset: $var(input)
+            last_ckpt: $var(output)/last.ckpt
+            transforms: $import(train_transforms.yaml)
+            repeat: 10
+            dataloader:
+                batch_size: 32
+                shuffle: true
+                num_workers: 4
+                drop_last: false
+                prefecth: 2
+            device: cuda
+            n_epochs: $var(epochs, default=10)
+            learning_rate: 0.001
+            image_key: image
+            image_size: 256
+            image_channels: 3

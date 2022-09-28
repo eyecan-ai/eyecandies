@@ -5,3 +5,4 @@ __email__ = "info@eyecan.ai"
 __version__ = "1.0.0"
 
 from eyecandies.commands.download import GetEyecandiesCommand
+from eyecandies.commands.train import TrainCommand

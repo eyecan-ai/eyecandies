@@ -108,16 +108,16 @@ class GetEyecandiesCommand(PipelimeCommand, title="ec-get"):
             "peppermintcandy": "Peppermint Candy",
         }
         std_url = {
-            "candycane": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",
-            "chocolatecookie": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",
-            "chocolatepraline": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",
-            "confetto": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",
-            "gummybear": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",
-            "hazelnuttruffle": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",
-            "licoricesandwich": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",
-            "lollipop": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",
-            "marshmallow": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",
-            "peppermintcandy": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",
+            "candycane": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
+            "chocolatecookie": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
+            "chocolatepraline": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
+            "confetto": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
+            "gummybear": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
+            "hazelnuttruffle": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
+            "licoricesandwich": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
+            "lollipop": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
+            "marshmallow": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
+            "peppermintcandy": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
         }
 
         cats = (

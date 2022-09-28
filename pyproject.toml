@@ -30,6 +30,8 @@ keywords = [
 ]
 dependencies = [
     "pipelime-python",
+    "torch",
+    "torchvision",
 ]
 dynamic = [ "version" ]
 
