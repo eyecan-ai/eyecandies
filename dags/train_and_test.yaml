@@ -1,8 +1,8 @@
 nodes:
     train:
         ec-train:
-            train_dataset: $var(input)
-            last_ckpt: $var(output)/last.ckpt
+            train_dataset: $var(train_folder)
+            last_ckpt: $var(result_folder)/last.ckpt
             transforms: $import(train_transforms.yaml)
             repeat: 10
             dataloader:
@@ -14,6 +14,21 @@ nodes:
             device: cuda
             n_epochs: $var(epochs, default=10)
             learning_rate: 0.001
+            image_key: image
+            image_size: 256
+            image_channels: 3
+    test:
+        ec-test:
+            good_dataset: $var(test_good_folder)
+            bad_dataset: $var(test_bad_folder)
+            ckpt: $var(result_folder)/last.ckpt
+            dataloader:
+                batch_size: 32
+                shuffle: false
+                num_workers: 4
+                drop_last: false
+                prefecth: 2
+            device: cuda
             image_key: image
             image_size: 256
             image_channels: 3

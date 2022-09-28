@@ -85,11 +85,15 @@ class TrainCommand(PipelimeCommand, title="ec-train"):
                 )
             )
 
-        # resize the images
+        # resize the images, normalize and convert them to tensors
         train_seq = train_seq.map(
             plst.StageAlbumentations(
                 transform=A.Compose(
-                    [A.Resize(self.image_size, self.image_size), ToTensorV2()]
+                    [
+                        A.Resize(self.image_size, self.image_size),
+                        A.Normalize(mean=0.0, std=1.0, always_apply=True),
+                        ToTensorV2(),
+                    ]
                 ),
                 keys_to_targets={self.image_key: "image"},
             )
@@ -112,12 +116,12 @@ class TrainCommand(PipelimeCommand, title="ec-train"):
         current_loss = 0
         for epoch in self.track(range(self.n_epochs), message="Training epochs"):
             for batch in data_loader:
-                image = batch[self.image_key].to(device=device)
+                images = batch[self.image_key].to(device=device)
 
                 optimizer.zero_grad()
 
-                output = model(image)
-                loss = loss_fn(output, image)
+                output = model(images)
+                loss = loss_fn(output, images)
                 loss.backward()
                 optimizer.step()
 

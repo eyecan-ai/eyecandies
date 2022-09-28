@@ -32,6 +32,7 @@ dependencies = [
     "pipelime-python",
     "torch",
     "torchvision",
+    "torchmetrics",
 ]
 dynamic = [ "version" ]
 

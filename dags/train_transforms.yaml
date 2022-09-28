@@ -29,9 +29,3 @@ transform:
       saturation:
         - 0.8
         - 1.2
-    - __class_fullname__: Normalize
-      always_apply: true
-      max_pixel_value: 255
-      mean: 0.5
-      p: 1.0
-      std: 0.5
