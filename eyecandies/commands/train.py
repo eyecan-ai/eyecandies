@@ -32,7 +32,10 @@ class TrainCommand(PipelimeCommand, title="ec-train"):
 
     # PARAMETERS
     transforms: t.Optional[t.Mapping] = Field(
-        None, description="Transformations to apply to input images."
+        None,
+        description=(
+            "Transformations to apply to input images (albumentation format)."
+        ),
     )
     repeat: PositiveInt = Field(
         1,
@@ -107,6 +110,7 @@ class TrainCommand(PipelimeCommand, title="ec-train"):
         model = AutoEncoder(
             image_size=self.image_size, image_channels=self.image_channels
         )
+        model.train(True)
         model.to(device=device)
 
         # optimizer and loss function

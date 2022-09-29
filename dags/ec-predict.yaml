@@ -1,0 +1,14 @@
+ec-predict:
+  test_dataset: $var(test_folder)
+  ckpt: $var(result_folder)/last.ckpt
+  predictions: $var(result_folder)/test_prediction
+  dataloader:
+    batch_size: 32
+    shuffle: false
+    num_workers: 4
+    drop_last: false
+    prefecth: 2
+  device: $var(device, default=cuda)
+  image_key: image
+  image_size: 256
+  image_channels: 3

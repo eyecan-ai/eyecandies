@@ -1,4 +1,9 @@
+import typing as t
 from pydantic import BaseModel, Field
+
+if t.TYPE_CHECKING:
+    import torch
+    import numpy as np
 
 
 class DataLoaderOptions(BaseModel):
@@ -25,3 +30,9 @@ class DataLoaderOptions(BaseModel):
             drop_last=self.drop_last,
             prefetch_factor=self.prefecth,
         )
+
+
+def image_tensor_to_numpy(x: "torch.Tensor") -> "np.ndarray":
+    import numpy as np
+
+    return (x.detach().permute(1, 2, 0).cpu().numpy() * 255.0).astype(np.uint8)

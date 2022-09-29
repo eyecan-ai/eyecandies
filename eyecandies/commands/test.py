@@ -1,8 +1,8 @@
 import typing as t
 from pathlib import Path
 
-from eyecandies.commands.utils import DataLoaderOptions
-from pipelime.commands.interfaces import InputDatasetInterface
+from eyecandies.commands.utils import DataLoaderOptions, image_tensor_to_numpy
+from pipelime.commands.interfaces import InputDatasetInterface, OutputDatasetInterface
 from pipelime.piper import PipelimeCommand, PiperPortType
 from pydantic import Field
 
@@ -24,13 +24,14 @@ class TestCommand(PipelimeCommand, title="ec-test"):
     )
 
     # OUTPUT
-    predictions: t.Optional[Path] = Field(
-        None,
+    predictions: t.Optional[OutputDatasetInterface] = OutputDatasetInterface.pyd_field(
+        is_required=False,
         description="The output dataset with predictions and metrics.",
         piper_port=PiperPortType.OUTPUT,
     )
     final_metrics: t.Optional[t.Mapping[str, float]] = Field(
         None,
+        description="Metrics computed on the test dataset.",
         exclude=True,
         repr=False,
         piper_port=PiperPortType.OUTPUT,
@@ -38,7 +39,10 @@ class TestCommand(PipelimeCommand, title="ec-test"):
 
     # PARAMETERS
     transforms: t.Optional[t.Mapping] = Field(
-        None, description="Transformations to apply to input images."
+        None,
+        description=(
+            "Transformations to apply to input images (albumentation format)."
+        ),
     )
     dataloader: DataLoaderOptions = Field(
         default_factory=DataLoaderOptions,  # type: ignore
@@ -113,6 +117,7 @@ class TestCommand(PipelimeCommand, title="ec-test"):
         )
         model.to(device=device)
         model.load_state_dict(torch.load(self.ckpt))
+        model.train(False)
 
         # create the metric
         auroc_mt = tm.AUROC()
@@ -120,9 +125,10 @@ class TestCommand(PipelimeCommand, title="ec-test"):
 
         # output dataset
         if self.predictions is not None:
-            out_stream = DataStream.create_new_underfolder(
-                str(self.predictions), zfill=test_seq.best_zfill()
-            )
+            outpipe = self.predictions.as_pipe()
+            if outpipe["to_underfolder"]["zfill"] is None:
+                outpipe["to_underfolder"]["zfill"] = test_seq.best_zfill()
+            out_stream = DataStream(output_pipe=outpipe)
 
         with torch.no_grad():
             for batch in self.track(data_loader, message="Test batches"):
@@ -130,26 +136,37 @@ class TestCommand(PipelimeCommand, title="ec-test"):
                 labels = batch["label"].to(device=device)
                 idxs = batch["~idx"]
 
-                output = model(images)
-                diff = torch.abs(images - output)
+                outputs = model(images)
+                diffs = torch.abs(images - outputs)
                 scores = torch.clamp(
-                    torch.max(diff.reshape(diff.shape[0], -1), dim=1).values,
+                    torch.max(diffs.reshape(diffs.shape[0], -1), dim=1).values,
                     min=0.0,
                     max=1.0,
                 )
+                scores = scores.reshape(-1, 1)
 
-                auroc_mt(labels, scores)
+                auroc_mt.update(scores, labels)
 
                 if self.predictions is not None:
-                    for img, i, d, s, pred in zip(images, idxs, diff, scores, output):
+                    for img, index, abs_diff, max_diff, pred in zip(
+                        images, idxs, diffs, scores, outputs
+                    ):
                         out_stream.set_output(  # type: ignore
-                            idx=i,
+                            idx=int(index.item()),
                             sample=Sample(
                                 {
-                                    "image": pli.PngImageItem(img),
-                                    "output": pli.PngImageItem(pred),
-                                    "diff": pli.PngImageItem(d),
-                                    "score": pli.TxtNumpyItem(s),
+                                    "image": pli.PngImageItem(
+                                        image_tensor_to_numpy(img)
+                                    ),
+                                    "output": pli.PngImageItem(
+                                        image_tensor_to_numpy(pred)
+                                    ),
+                                    "heatmap": pli.PngImageItem(
+                                        image_tensor_to_numpy(abs_diff)
+                                    ),
+                                    "score": pli.TxtNumpyItem(
+                                        float(max_diff.cpu().item())
+                                    ),
                                 }
                             ),
                         )

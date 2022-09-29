@@ -16,7 +16,7 @@ class AddLabelStage(SampleStage, title="add-label"):
     def __call__(self, x: "Sample") -> "Sample":
         from pipelime.items import TxtNumpyItem
 
-        return x.set_item(self.label_key, TxtNumpyItem(self.label))
+        return x.set_item(self.label_key, TxtNumpyItem([self.label]))
 
 
 class GoodLabelStage(AddLabelStage, title="good-label"):
