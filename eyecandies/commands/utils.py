@@ -32,7 +32,14 @@ class DataLoaderOptions(BaseModel):
         )
 
 
-def image_tensor_to_numpy(x: "torch.Tensor") -> "np.ndarray":
+def image_tensor_to_numpy(x: "torch.Tensor", to_uint8: bool = True) -> "np.ndarray":
     import numpy as np
 
-    return (x.detach().permute(1, 2, 0).cpu().numpy() * 255.0).astype(np.uint8)
+    x = x.detach()
+    if x.ndim == 3:
+        x = x.permute(1, 2, 0)
+    x = x.cpu().numpy()
+    if to_uint8:
+        x = (x * 255).astype(np.uint8)  # type: ignore
+
+    return x  # type: ignore

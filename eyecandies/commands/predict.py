@@ -109,15 +109,15 @@ class PredictCommand(PipelimeCommand, title="ec-predict"):
                 idxs = batch["~idx"]
 
                 outputs = model(images)
-                diffs = torch.abs(images - outputs)
+                max_diffs = torch.abs(images - outputs).max(dim=1).values
                 scores = torch.clamp(
-                    torch.max(diffs.reshape(diffs.shape[0], -1), dim=1).values,
+                    torch.max(max_diffs.reshape(max_diffs.shape[0], -1), dim=1).values,
                     min=0.0,
                     max=1.0,
                 )
 
-                for img, index, abs_diff, max_diff, pred in zip(
-                    images, idxs, diffs, scores, outputs
+                for img, index, hm, max_diff, pred in zip(
+                    images, idxs, max_diffs, scores, outputs
                 ):
                     out_stream.set_output(  # type: ignore
                         idx=int(index.item()),
@@ -125,8 +125,11 @@ class PredictCommand(PipelimeCommand, title="ec-predict"):
                             {
                                 "image": pli.PngImageItem(image_tensor_to_numpy(img)),
                                 "output": pli.PngImageItem(image_tensor_to_numpy(pred)),
-                                "heatmap": pli.PngImageItem(
-                                    image_tensor_to_numpy(abs_diff)
+                                "heatmap": pli.NpyNumpyItem(
+                                    image_tensor_to_numpy(hm, False)
+                                ),
+                                "heatmap_img": pli.PngImageItem(
+                                    image_tensor_to_numpy(hm)
                                 ),
                                 "score": pli.TxtNumpyItem(float(max_diff.cpu().item())),
                             }
