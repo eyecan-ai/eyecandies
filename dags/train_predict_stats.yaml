@@ -1,0 +1,4 @@
+nodes:
+  train: $import("ec-train.yaml")
+  predict: $import("ec-predict.yaml")
+  stats: $import("ec-metrics.yaml")

@@ -1,10 +1,9 @@
 import typing as t
-from pathlib import Path
 
 from eyecandies.commands.utils import DataLoaderOptions, image_tensor_to_numpy
 from pipelime.commands.interfaces import InputDatasetInterface, OutputDatasetInterface
 from pipelime.piper import PipelimeCommand, PiperPortType
-from pydantic import Field
+from pydantic import Field, FilePath
 
 
 class TestCommand(PipelimeCommand, title="ec-test"):
@@ -17,7 +16,7 @@ class TestCommand(PipelimeCommand, title="ec-test"):
     bad_dataset: InputDatasetInterface = InputDatasetInterface.pyd_field(
         description="Test dataset of `bad` samples.", piper_port=PiperPortType.INPUT
     )
-    ckpt: Path = Field(
+    ckpt: FilePath = Field(
         "last.ckpt",
         description="The checkpoint to load.",
         piper_port=PiperPortType.INPUT,
@@ -63,6 +62,7 @@ class TestCommand(PipelimeCommand, title="ec-test"):
     def run(self):
         import torch
         import torchmetrics as tm
+        import numpy as np
         import albumentations as A
         from albumentations.pytorch import ToTensorV2
         import pipelime.stages as plst
@@ -137,9 +137,9 @@ class TestCommand(PipelimeCommand, title="ec-test"):
                 idxs = batch["~idx"]
 
                 outputs = model(images)
-                diffs = torch.abs(images - outputs)
+                max_diffs = torch.abs(images - outputs).max(dim=1).values
                 scores = torch.clamp(
-                    torch.max(diffs.reshape(diffs.shape[0], -1), dim=1).values,
+                    torch.max(max_diffs.reshape(max_diffs.shape[0], -1), dim=1).values,
                     min=0.0,
                     max=1.0,
                 )
@@ -148,8 +148,8 @@ class TestCommand(PipelimeCommand, title="ec-test"):
                 auroc_mt.update(scores, labels)
 
                 if self.predictions is not None:
-                    for img, index, abs_diff, max_diff, pred in zip(
-                        images, idxs, diffs, scores, outputs
+                    for img, index, hm, max_diff, pred in zip(
+                        images, idxs, max_diffs, scores, outputs
                     ):
                         out_stream.set_output(  # type: ignore
                             idx=int(index.item()),
@@ -161,8 +161,11 @@ class TestCommand(PipelimeCommand, title="ec-test"):
                                     "output": pli.PngImageItem(
                                         image_tensor_to_numpy(pred)
                                     ),
-                                    "heatmap": pli.PngImageItem(
-                                        image_tensor_to_numpy(abs_diff)
+                                    "heatmap": pli.NpyNumpyItem(
+                                        image_tensor_to_numpy(hm, False)
+                                    ),
+                                    "heatmap_img": pli.PngImageItem(
+                                        image_tensor_to_numpy(hm)
                                     ),
                                     "score": pli.TxtNumpyItem(
                                         float(max_diff.cpu().item())
