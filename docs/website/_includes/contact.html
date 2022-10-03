@@ -1,6 +1,18 @@
 <section class="hero is-fullheight has-text-centered" id="contact">
     <div class="hero-body">
         <div class="container">
+            <div class="columns">
+                {% for author in site.data.authors %}
+                <div class="column is-one-seventh-desktop is-one-seventh-tablet is-one-seventh-fullhd">
+                    <figure class="image">
+                        <img class="is-rounded" src="{{author.pic}}" alt="{{author.name}}">
+                    </figure>
+                    <br>
+                    <p><b>{{author.name}}</b></p>
+                    <p>{{author.email}}</p>
+                </div>
+                {% endfor %}
+            </div>
             {% unless site.facebook_username == %}
             <a id="contact-button" href="https://m.me/{{site.facebook_username}}"
                 class="button is-rounded is-uppercase has-text-weight-normal is-black is-outlined has-text-weight-semibold column is-two-fifths"
