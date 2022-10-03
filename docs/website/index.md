@@ -15,6 +15,18 @@ We present Eyecandies, a novel synthetic dataset for unsupervised anomaly detect
 
 We believe this dataset may incentivize the exploration of original approaches to solve the anomaly detection task, e.g. by combining color, depth and normal maps, as they are not provided by most of the existing datasets. Indeed, in order to demonstrate how exploiting additional information may actually lead to higher detection performance, we show the results obtained by training a deep convolutional autoencoder to reconstruct different combinations of inputs.
 
+### Cite Us
+
+```
+@inproceedings{bonfiglioli2022eyecandies,
+    title={The Eyecandies Dataset for Unsupervised Multimodal Anomaly Detection and Localization},
+    author={Bonfiglioli, Luca and Toschi, Marco and Silvestri, Davide and Fioraio, Nicola and De Gregorio, Daniele},
+    booktitle={Proceedings of the 16th Asian Conference on Computer Vision (ACCV2022},
+    note={ACCV},
+    year={2022},
+}
+```
+
 </div>
 </div>
 
@@ -25,13 +37,13 @@ We believe this dataset may incentivize the exploration of original approaches t
 
 ## Ten Object Classes
 
-| Candy Cane                                                     | Chocolate cookie                                                           | Chocolate praline                                                            | Confetto                                                   | Gummy bear                                                     |
+| Candy Cane                                                     | Chocolate Cookie                                                           | Chocolate Praline                                                            | Confetto                                                   | Gummy Bear                                                     |
 | -------------------------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------- |
 | ![Alt text](assets\images\objects\candy_cane.jpg "candy cane") | ![Alt text](assets\images\objects\chocolate_cookie.jpg "chocolate cookie") | ![Alt text](assets\images\objects\chocolate_praline.jpg "chocolate_praline") | ![Alt text](assets\images\objects\confetto.jpg "confetto") | ![Alt text](assets\images\objects\gummy_bear.jpg "gummy_bear") |
 
 <!-- this space is essential -->
 
-| Hazelnut truffle                                                           | Licorice sandwich                                                             | Lollipop                                                   | Marshmallow                                                      | Peppermint candy                                                           |
+| Hazelnut Truffle                                                           | Licorice Sandwich                                                             | Lollipop                                                   | Marshmallow                                                      | Peppermint Candy                                                           |
 | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | ![Alt text](assets\images\objects\hazelnut_truffle.jpg "hazelnut_truffle") | ![Alt text](assets\images\objects\licorice_sandwich.jpg "licorice_sandwitch") | ![Alt text](assets\images\objects\lollipop.jpg "lollipop") | ![Alt text](assets\images\objects\marshmallow.jpg "marshmallow") | ![Alt text](assets\images\objects\peppermint_candy.jpg "peppermint candy") |
 
@@ -44,7 +56,7 @@ We believe this dataset may incentivize the exploration of original approaches t
 
 ## Multi-Light
 
-| All spotlights                                        | Bottom spot                                           | Right spot                                            | Top spot                                              | Left spot                                             | Spots & Camera light                                  |
+| All spotlights                                        | Bottom spot                                           | Right spot                                            | Top spot                                              | Left spot                                             | Global light box                                      |
 | ----------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------- |
 | ![Alt text](assets\images\multilight\image_0.jpg "0") | ![Alt text](assets\images\multilight\image_1.jpg "1") | ![Alt text](assets\images\multilight\image_2.jpg "2") | ![Alt text](assets\images\multilight\image_3.jpg "3") | ![Alt text](assets\images\multilight\image_4.jpg "4") | ![Alt text](assets\images\multilight\image_5.jpg "5") |
 
@@ -52,54 +64,211 @@ We believe this dataset may incentivize the exploration of original approaches t
 </div>
 </div>
 
-# DOWNLOAD
+# LEADERBOARD
 
-<div class="hero has-text-centered" id="download">
-<div class="myWrapper" markdown="1" align="left">
+<div class="hero has-text-centered" id="leaderboard">
+<div class="myWrapper" align="left" markdown="1">
 
-## Download Links
+{% for numbers in site.data.sasso %}
+    {% for number in numbers.numbers %}
+        <div>{{number}}</div>
+    {% endfor %}
+{% endfor %}
 
-Download individual classes separately:
-- [Candy Cane](https://drive.google.com/file/d/1OI0Jh5tUj98j3ihFXCXf7EW2qSpeaTSY/view?usp=sharing)
-- [Chocolate Cookie](https://drive.google.com/file/d/1PEvIXZOcxuDMBo4iuCsUVDN63jisg0QN/view?usp=sharing)
-- [Chocolate Praline](https://drive.google.com/file/d/1dRlDAS31QJSwROgA6yFcXo85mL0EBh25/view?usp=sharing)
-- [Confetto](https://drive.google.com/file/d/10GNPUIQTUheT-qd6EzO76fsUgAwsHfaq/view?usp=sharing)
-- [Gummy Bear](https://drive.google.com/file/d/1OCAKXPmpNrD9s3oUcQ--mhRZTt4HGJ-W/view?usp=sharing)
-- [Hazelnut Truffle](https://drive.google.com/file/d/1PsKc4hXxsuIjqwyHh7ciPAeS-IxsPikm/view?usp=sharing)
-- [Licorice Sandwich](https://drive.google.com/file/d/1dtU_l9gD1zoCN7fIYRksd_9KeyZklaHC/view?usp=sharing)
-- [Lollipop](https://drive.google.com/file/d/1DbL91Zjm2I9-AfJewU3M354pW4vnuaNz/view?usp=sharing)
-- [Marshmallow](https://drive.google.com/file/d/1pebIU3AegEFilqqoROaVzOZqkSgX-JTo/view?usp=sharing)
-- [Peppermint Candy](https://drive.google.com/file/d/1tF_1fPJYaUVaf1AwjlEi-fsGWzgCx6UF/view?usp=sharing)
+<table>
+    <tr>
+        <td></td>
+        <td></td>
+        <td>Avg.</td>
+        <td>Candy Cane</td>
+        <td>Chocolate Cookie</td>
+        <td>Chocolate Praline</td>
+        <td>Confetto</td>
+        <td>Gummy Bear</td>
+        <td>Hazelnut Truffle</td>
+        <td>Licorice Sandwich</td>
+        <td>Lollipop</td>
+        <td>Marshmallow</td>
+        <td>Peppermint Candy</td>
+    </tr>
+    <tr>
+        <td colspan=1>Ganomaly</td>
+        <td>r18</td>
+        <td>0.507</td>
+        <td>0.485</td>
+        <td>0.512</td>
+        <td>0.532</td>
+        <td>0.504</td>
+        <td>0.558</td>
+        <td>0.486</td>
+        <td>0.467</td>
+        <td>0.511</td>
+        <td>0.481</td>
+        <td>0.528</td>
+    </tr>
+    <tr>
+        <td rowspan=2>DFKDE</td>
+        <td>r18</td>
+        <td>0.545</td>
+        <td>0.537</td>
+        <td>0.589</td>
+        <td>0.517</td>
+        <td>0.490</td>
+        <td>0.591</td>
+        <td>0.490</td>
+        <td>0.532</td>
+        <td>0.536</td>
+        <td>0.646</td>
+        <td>0.518</td>
+    </tr>
+    <tr>
+        <td>wr50</td>
+        <td>0.555</td>
+        <td><b>0.539</b></td>
+        <td>0.577</td>
+        <td>0.482</td>
+        <td>0.548</td>
+        <td>0.541</td>
+        <td>0.492</td>
+        <td>0.524</td>
+        <td>0.602</td>
+        <td>0.658</td>
+        <td>0.591</td>
+    </tr>
+    <tr>
+        <td rowspan=2>DFM</td>
+        <td>r18</td>
+        <td>0.676</td>
+        <td>0.529</td>
+        <td>0.759</td>
+        <td>0.587</td>
+        <td>0.649</td>
+        <td>0.655</td>
+        <td>0.611</td>
+        <td>0.692</td>
+        <td>0.599</td>
+        <td>0.942</td>
+        <td>0.736</td>
+    </tr>
+    <tr>
+        <td>wr50</td>
+        <td>0.692</td>
+        <td>0.532</td>
+        <td>0.776</td>
+        <td>0.624</td>
+        <td>0.675</td>
+        <td>0.681</td>
+        <td>0.596</td>
+        <td>0.685</td>
+        <td>0.618</td>        
+        <td>0.964</td>
+        <td>0.770</td>
+    </tr>
+    <tr>
+        <td rowspan=2>STFPM</td>
+        <td>r18</td>
+        <td>0.688</td>
+        <td>0.527</td>
+        <td>0.628</td>
+        <td>0.766</td>
+        <td>0.666</td>
+        <td>0.728</td>
+        <td>0.727</td>
+        <td>0.738</td>        
+        <td>0.572</td>
+        <td>0.893</td>        
+        <td>0.631</td>
+    </tr>
+    <tr>
+        <td>wr50</td>
+        <td>0.708</td>
+        <td>0.551</td>
+        <td>0.654</td>
+        <td>0.576</td>
+        <td>0.784</td>
+        <td>0.737</td>
+        <td><b>0.790</b></td>
+        <td>0.778</td>
+        <td>0.620</td>
+        <td>0.840</td>
+        <td>0.749</td>
+    </tr>
+    <tr>
+        <td rowspan=2>PADIM</td>
+        <td>r18</td>
+        <td>0.754</td>
+        <td>0.537</td>
+        <td>0.765</td>
+        <td>0.754</td>
+        <td>0.794</td>
+        <td>0.798</td>
+        <td>0.645</td>
+        <td>0.752</td>        
+        <td>0.621</td>
+        <td>0.978</td>
+        <td>0.894</td>
+    </tr>
+    <tr>
+        <td>wr50</td>
+        <td><b>0.794</b></td>
+        <td>0.531</td>
+        <td>0.816</td>
+        <td><b>0.821</b></td>
+        <td><b>0.856</b></td>
+        <td><b>0.826</b></td>
+        <td>0.727</td>
+        <td><b>0.784</b></td>
+        <td>0.665</td>
+        <td><b>0.987</b></td>
+        <td><b>0.924</b></td>
+    </tr>
+    <tr>
+        <td rowspan=1>Eyecan</td>
+        <td>RGB</td>
+        <td>0.701</td>
+        <td>0.527</td>
+        <td><b>0.848</b></td>
+        <td>0.772</td>
+        <td>0.734</td>
+        <td>0.590</td>
+        <td>0.508</td>
+        <td>0.693</td>
+        <td><b>0.760</b></td>
+        <td>0.851</td>
+        <td>0.730</td>
+    </tr>
+</table>
+
+## Submit Your Results
+
+Send us your results on the private test set so we can add your method to our leaderboard!
+
+To do so, send an e-mail to **luca.bonfiglioli@eyecan.ai** with subject "Eyecandies results submission" and the following info:
+
+- The **name**/s of your method/s.
+- A link to a published **paper** describing it/them. Papers that are not peer-reviewed and published in mainstream conferences/journals will be ignored.
+- A [Pipelime](https://github.com/eyecan-ai/pipelime-python.git) underfolder for every proposed method, containing predicted heatmaps for every test set sample. We will compute metrics on those heatmaps. More details below.
+
+### Results format
+
+Results must be submitted as a pipelime **underfolder** dataset. You can create it using pipelime (recommended) or manually - they are basically .npy files inside a folder with the following directory structure:
+
+- 📁 `my_folder` - (name it as you want)
+
+  - 📁 `data`
+  
+    - 📄 `000_heatmap.npy`
+    - 📄 `001_heatmap.npy`
+    - 📄 `002_heatmap.npy`
+    - You get the idea...
+
+**Order matters** - Every heatmap file refers to the corresponding sample from the private test set, please keep them in the same order!
+
+Every heatmap file should contain a H×W numpy float array with per-pixel anomaly scores. If your method does not support localization, you can send 1×1 heatmaps with just a single value. Values should not be normalized, meaning they can lie in whatever range you want, since AUC metrics are threshold-independent. 
+
+Take a look at the [Eyecandies](https://github.com/eyecan-ai/eyecandies.git) repo for examples and tutorials and feel free to ask us questions!
 
 </div>
 </div>
 
-# DATASET FOLDER FORMAT
 
-<div class="hero has-text-centered" id="format">
-<div class="myWrapper" markdown="1" align="left">
-
-Each object class folder contains a train dataset, a validation dataset, a public dataset and a private dataset (with no groundtruths).<br/>
-For each dataset each sample is composed by the following items:
-- 📂train:
-
-    - 📜*_object_params.yml: parameters for the replicability of the object render
-    - 📜*_pose.txt: camera pose
-    - 📷*_image_0.png: RGB image with all spotlights on
-    - 📷*_image_1.png: RGB image with bottom spot on
-    - 📷*_image_2.png: RGB image with right spot on
-    - 📷*_image_3.png: RGB image with top spot on
-    - 📷*_image_4.png: RGB image with left spot on
-    - 📷*_image_5.png: RGB image with all spotlights and camera light on
-    - 📷*_depth.png: depth image
-    - 📜*_info_depth.yml: parameters for the denormalization of the depth image
-    - 📷*_normals.png: normals map image
-    - 📜*_metadata.yml: GT labels
-    - 📷*_normals_mask.png: GT normals mask
-    - 📷*_bumps_mask.png: GT bumps mask
-    - 📷*_colors_mask.png: GT colors mask
-    - 📷*_dimples_mask.png: GT dimples mask
-    - 📷*_mask.png: GT mask composition of all types of anomalies 
-
-</div>
-</div>
