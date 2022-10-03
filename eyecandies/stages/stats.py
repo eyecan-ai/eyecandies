@@ -52,8 +52,8 @@ class ComputeStatsStage(SampleStage, title="stats"):
             and self.heatmap_key in x
             and self.mask_key in x
         ):
-            hm: np.ndarray = x[self.heatmap_key]()  # type: ignore
-            mask = (x[self.mask_key]() != 0).astype(np.int32)
+            hm: np.ndarray = x[self.heatmap_key]().squeeze()  # type: ignore
+            mask = (x[self.mask_key]().squeeze() != 0).astype(np.int32)  # type: ignore
 
             if mask.shape != hm.shape:
                 mask = cv2.resize(mask, hm.shape[::-1], interpolation=cv2.INTER_NEAREST)

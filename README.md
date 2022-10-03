@@ -68,7 +68,7 @@ or download all the categories at once:
 $ pipelime -m eyecandies ec-get +o <output_root_folder>
 ```
 
-already downloaded categories will be skipped, of course. Here a list of the available categories:
+Already downloaded categories will be skipped, of course. Here a list of the available categories:
 - Candy Cane
 - Chocolate Cookie
 - Chocolate Praline
@@ -79,8 +79,6 @@ already downloaded categories will be skipped, of course. Here a list of the ava
 - Lollipop
 - Marshmallow
 - Peppermint Candy
-
-Note that the category names are **case- and space-insensitive**.
 
 ## Train A Model
 
@@ -129,4 +127,4 @@ As you can see, the pipeline is composed of three main steps:
 2. **autoenc-predict**: the trained model predicts anomaly heatmaps on the public and private test set
 3. **ec-metrics**: ROC and AUROC are computed on the predictions using the public ground truth
 
-To get the results on any other method, just replace the first two nodes, then run **ec-metrics** on the new predictions. Note that results are given for the public test set only: to get the results on the private test set, please follow the instructions on the [Eyecandies website](https://eyecan-ai.github.io/eyecandies/).
+To get the results on any other method, just replace the first two nodes, then run **ec-metrics** on the new predictions. Note that results are given for the public test set only: to get the results on the private test set as well, please follow the instructions on the [Eyecandies website](https://eyecan-ai.github.io/eyecandies/).
