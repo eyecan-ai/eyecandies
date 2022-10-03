@@ -1,0 +1,6 @@
+- method_name: padim
+  aucs:
+      - 0.93
+      - 0.3223
+      - 0.2132
+  avg_auc: 0.932

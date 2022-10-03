@@ -69,6 +69,12 @@ We believe this dataset may incentivize the exploration of original approaches t
 <div class="hero has-text-centered" id="leaderboard">
 <div class="myWrapper" align="left">
 
+{% for numbers in site.data.sasso %}
+    {% for number in numbers.numbers %}
+        <div>{{number}}</div>
+    {% endfor %}
+{% endfor %}
+
 <table>
     <tr>
         <td></td>
