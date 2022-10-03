@@ -67,7 +67,7 @@ We believe this dataset may incentivize the exploration of original approaches t
 # PRIVATE LEADERBOARD
 
 <div class="hero has-text-centered" id="leaderboard">
-<div class="myWrapper" align="left">
+<div class="myWrapper" align="left" markdown="1">
 
 {% for numbers in site.data.sasso %}
     {% for number in numbers.numbers %}
@@ -228,7 +228,34 @@ We believe this dataset may incentivize the exploration of original approaches t
     </tr>
 </table>
 
+## Submit Your Results
 
+Send us your results on the private test set so we can add your method to our leaderboard!
+
+To do so, send an e-mail to **luca.bonfiglioli@eyecan.ai** with subject "Eyecandies results submission" and the following info:
+
+- The **name**/s of your method/s.
+- A link to a published **paper** describing it/them. Papers that are not peer-reviewed and published in mainstream conferences/journals will be ignored.
+- A [Pipelime](https://github.com/eyecan-ai/pipelime-python.git) underfolder for every proposed method, containing predicted heatmaps for every test set sample. We will compute metrics on those heatmaps. More details below.
+
+### Results format
+
+Results must be submitted as a pipelime **underfolder** dataset. You can create it using pipelime (recommended) or manually - they are basically .npy files inside a folder with the following directory structure:
+
+- 📁 `my_folder` - (name it as you want)
+
+  - 📁 `data`
+  
+    - 📄 `000_heatmap.npy`
+    - 📄 `001_heatmap.npy`
+    - 📄 `002_heatmap.npy`
+    - You get the idea...
+
+**Order matters** - Every heatmap file refers to the corresponding sample from the private test set, please keep them in the same order!
+
+Every heatmap file should contain a H×W numpy float array with per-pixel anomaly scores. If your method does not support localization, you can send 1×1 heatmaps with just a single value. Values should not be normalized, meaning they can lie in whatever range you want, since AUC metrics are threshold-independent. 
+
+Take a look at the [Eyecandies](https://github.com/eyecan-ai/eyecandies.git) repo for examples and tutorials and feel free to ask us questions!
 
 </div>
 </div>
