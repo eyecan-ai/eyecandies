@@ -6,8 +6,8 @@ from pipelime.piper import PipelimeCommand, PiperPortType
 from pydantic import Field, FilePath
 
 
-class TestCommand(PipelimeCommand, title="ec-test"):
-    """Compute predictions and metrics."""
+class TestCommand(PipelimeCommand, title="autoenc-test"):
+    """Simple computation of predictions and metrics with a naive autoencoder."""
 
     # INPUT
     good_dataset: InputDatasetInterface = InputDatasetInterface.pyd_field(
@@ -62,7 +62,6 @@ class TestCommand(PipelimeCommand, title="ec-test"):
     def run(self):
         import torch
         import torchmetrics as tm
-        import numpy as np
         import albumentations as A
         from albumentations.pytorch import ToTensorV2
         import pipelime.stages as plst
