@@ -42,17 +42,17 @@ class EyecandiesDatasetInfo(PipelimeCommand):
         "marshmallow": "Marshmallow",
         "peppermintcandy": "Peppermint Candy",
     }
-    DATA_URLS: t.ClassVar[t.Mapping[str, str]] = {
-        "candycane": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
-        "chocolatecookie": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
-        "chocolatepraline": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
-        "confetto": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
-        "gummybear": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
-        "hazelnuttruffle": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
-        "licoricesandwich": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
-        "lollipop": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
-        "marshmallow": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
-        "peppermintcandy": r"https://drive.google.com/uc?export=download&id=1ZEWNNoDp9NO_p_uqHwCaMH6L32BDkPm6",  # noqa: E501
+    DATA_IDS: t.ClassVar[t.Mapping[str, str]] = {
+        "candycane": r"1OI0Jh5tUj98j3ihFXCXf7EW2qSpeaTSY",
+        "chocolatecookie": r"1PEvIXZOcxuDMBo4iuCsUVDN63jisg0QN",
+        "chocolatepraline": r"1dRlDAS31QJSwROgA6yFcXo85mL0EBh25",
+        "confetto": r"10GNPUIQTUheT-qd6EzO76fsUgAwsHfaq",
+        "gummybear": r"1OCAKXPmpNrD9s3oUcQ--mhRZTt4HGJ-W",
+        "hazelnuttruffle": r"1PsKc4hXxsuIjqwyHh7ciPAeS-IxsPikm",
+        "licoricesandwich": r"1dtU_l9gD1zoCN7fIYRksd_9KeyZklaHC",
+        "lollipop": r"1DbL91Zjm2I9-AfJewU3M354pW4vnuaNz",
+        "marshmallow": r"1pebIU3AegEFilqqoROaVzOZqkSgX-JTo",
+        "peppermintcandy": r"1tF_1fPJYaUVaf1AwjlEi-fsGWzgCx6UF",
     }
 
 
@@ -104,19 +104,18 @@ class GetEyecandiesCommand(EyecandiesDatasetInfo, title="ec-get"):
     def run(self):
         from io import BytesIO
         import tarfile
-        from urllib.request import urlopen
 
-        url_name_target = []
-        for url, name in self._url_iterator():
+        id_name_target = []
+        for file_id, name in self._data_iterator():
             target = self.output / f"{''.join(name.split())}"
             if target.exists():
                 if not self.skip_existing:
                     raise ValueError(f"Output folder `{target}` already exists.")
             else:
-                url_name_target.append((url, name, target))
+                id_name_target.append((file_id, name, target))
 
-        for url, name, target in url_name_target:
-            resp = urlopen(url)
+        for file_id, name, target in id_name_target:
+            resp = self._get_direct_download_link(file_id)
             length = resp.getheader("content-length")
             if length:
                 length = int(length)
@@ -144,7 +143,7 @@ class GetEyecandiesCommand(EyecandiesDatasetInfo, title="ec-get"):
                 ):
                     tarball.extractall(path=target, members=[member])
 
-    def _url_iterator(self):
+    def _data_iterator(self):
         cats = (
             list(self.DATA_NAMES.values())
             if not self.category
@@ -152,7 +151,7 @@ class GetEyecandiesCommand(EyecandiesDatasetInfo, title="ec-get"):
         )
         cats = ["".join(c.lower().split()) for c in cats]
         for c in cats:
-            if c not in self.DATA_URLS:
+            if c not in self.DATA_IDS:
                 raise ValueError(
                     f"Unknown object category `{c}`.\n"
                     "Please choose one of the following: "
@@ -160,4 +159,50 @@ class GetEyecandiesCommand(EyecandiesDatasetInfo, title="ec-get"):
                 )
 
         for c in cats:
-            yield self.DATA_URLS[c], self.DATA_NAMES[c]
+            yield self.DATA_IDS[c], self.DATA_NAMES[c]
+
+    def _get_direct_download_link(self, file_id):
+        from urllib.request import urlopen
+
+        resp = urlopen(r"https://drive.google.com/uc?export=download&id=" + file_id)
+        if "Content-Disposition" in resp.headers:
+            return resp
+
+        direct_url = self._get_url_from_gdrive_confirmation(resp)
+        return urlopen(direct_url)
+
+    def _get_url_from_gdrive_confirmation(self, response):
+        import re
+
+        contents = response.read().decode("utf-8")
+
+        # The following code is taken from gdown https://github.com/wkentaro/gdown
+        url = ""
+        for line in contents.splitlines():
+            m = re.search(r'href="(\/uc\?export=download[^"]+)', line)
+            if m:
+                url = "https://docs.google.com" + m.groups()[0]
+                url = url.replace("&amp;", "&")
+                break
+            m = re.search('id="downloadForm" action="(.+?)"', line)
+            if m:
+                url = m.groups()[0]
+                url = url.replace("&amp;", "&")
+                break
+            m = re.search('"downloadUrl":"([^"]+)', line)
+            if m:
+                url = m.groups()[0]
+                url = url.replace("\\u003d", "=")
+                url = url.replace("\\u0026", "&")
+                break
+            m = re.search('<p class="uc-error-subcaption">(.*)</p>', line)
+            if m:
+                error = m.groups()[0]
+                raise RuntimeError(error)
+        if not url:
+            raise RuntimeError(
+                "Cannot retrieve the public link of the file. "
+                "You may need to change the permission to "
+                "'Anyone with the link', or have had many accesses."
+            )
+        return url
