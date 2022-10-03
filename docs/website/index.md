@@ -68,17 +68,9 @@ We believe this dataset may incentivize the exploration of original approaches t
 
 <div class="hero has-text-centered" id="leaderboard">
 <div class="myWrapper" align="left" markdown="1">
-
-{% for numbers in site.data.sasso %}
-    {% for number in numbers.numbers %}
-        <div>{{number}}</div>
-    {% endfor %}
-{% endfor %}
-
 <table>
     <tr>
-        <td></td>
-        <td></td>
+        <td>Category</td>
         <td>Avg.</td>
         <td>Candy Cane</td>
         <td>Chocolate Cookie</td>
@@ -91,152 +83,15 @@ We believe this dataset may incentivize the exploration of original approaches t
         <td>Marshmallow</td>
         <td>Peppermint Candy</td>
     </tr>
-    <tr>
-        <td colspan=1>Ganomaly</td>
-        <td>r18</td>
-        <td>0.507</td>
-        <td>0.485</td>
-        <td>0.512</td>
-        <td>0.532</td>
-        <td>0.504</td>
-        <td>0.558</td>
-        <td>0.486</td>
-        <td>0.467</td>
-        <td>0.511</td>
-        <td>0.481</td>
-        <td>0.528</td>
-    </tr>
-    <tr>
-        <td rowspan=2>DFKDE</td>
-        <td>r18</td>
-        <td>0.545</td>
-        <td>0.537</td>
-        <td>0.589</td>
-        <td>0.517</td>
-        <td>0.490</td>
-        <td>0.591</td>
-        <td>0.490</td>
-        <td>0.532</td>
-        <td>0.536</td>
-        <td>0.646</td>
-        <td>0.518</td>
-    </tr>
-    <tr>
-        <td>wr50</td>
-        <td>0.555</td>
-        <td><b>0.539</b></td>
-        <td>0.577</td>
-        <td>0.482</td>
-        <td>0.548</td>
-        <td>0.541</td>
-        <td>0.492</td>
-        <td>0.524</td>
-        <td>0.602</td>
-        <td>0.658</td>
-        <td>0.591</td>
-    </tr>
-    <tr>
-        <td rowspan=2>DFM</td>
-        <td>r18</td>
-        <td>0.676</td>
-        <td>0.529</td>
-        <td>0.759</td>
-        <td>0.587</td>
-        <td>0.649</td>
-        <td>0.655</td>
-        <td>0.611</td>
-        <td>0.692</td>
-        <td>0.599</td>
-        <td>0.942</td>
-        <td>0.736</td>
-    </tr>
-    <tr>
-        <td>wr50</td>
-        <td>0.692</td>
-        <td>0.532</td>
-        <td>0.776</td>
-        <td>0.624</td>
-        <td>0.675</td>
-        <td>0.681</td>
-        <td>0.596</td>
-        <td>0.685</td>
-        <td>0.618</td>        
-        <td>0.964</td>
-        <td>0.770</td>
-    </tr>
-    <tr>
-        <td rowspan=2>STFPM</td>
-        <td>r18</td>
-        <td>0.688</td>
-        <td>0.527</td>
-        <td>0.628</td>
-        <td>0.766</td>
-        <td>0.666</td>
-        <td>0.728</td>
-        <td>0.727</td>
-        <td>0.738</td>        
-        <td>0.572</td>
-        <td>0.893</td>        
-        <td>0.631</td>
-    </tr>
-    <tr>
-        <td>wr50</td>
-        <td>0.708</td>
-        <td>0.551</td>
-        <td>0.654</td>
-        <td>0.576</td>
-        <td>0.784</td>
-        <td>0.737</td>
-        <td><b>0.790</b></td>
-        <td>0.778</td>
-        <td>0.620</td>
-        <td>0.840</td>
-        <td>0.749</td>
-    </tr>
-    <tr>
-        <td rowspan=2>PADIM</td>
-        <td>r18</td>
-        <td>0.754</td>
-        <td>0.537</td>
-        <td>0.765</td>
-        <td>0.754</td>
-        <td>0.794</td>
-        <td>0.798</td>
-        <td>0.645</td>
-        <td>0.752</td>        
-        <td>0.621</td>
-        <td>0.978</td>
-        <td>0.894</td>
-    </tr>
-    <tr>
-        <td>wr50</td>
-        <td><b>0.794</b></td>
-        <td>0.531</td>
-        <td>0.816</td>
-        <td><b>0.821</b></td>
-        <td><b>0.856</b></td>
-        <td><b>0.826</b></td>
-        <td>0.727</td>
-        <td><b>0.784</b></td>
-        <td>0.665</td>
-        <td><b>0.987</b></td>
-        <td><b>0.924</b></td>
-    </tr>
-    <tr>
-        <td rowspan=1>Eyecan</td>
-        <td>RGB</td>
-        <td>0.701</td>
-        <td>0.527</td>
-        <td><b>0.848</b></td>
-        <td>0.772</td>
-        <td>0.734</td>
-        <td>0.590</td>
-        <td>0.508</td>
-        <td>0.693</td>
-        <td><b>0.760</b></td>
-        <td>0.851</td>
-        <td>0.730</td>
-    </tr>
+    {% for method in site.data.leaderboard.methods_results %}
+        <tr>
+            <td>{{method.method_name}}</td>
+            <td>{{method.avg_auc}}</td>
+            {% for auc in method.aucs %}
+                <td>{{auc}}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
 </table>
 
 ## Submit Your Results
