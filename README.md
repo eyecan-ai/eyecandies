@@ -72,7 +72,7 @@ already downloaded categories will be skipped, of course. Here a list of the ava
 - Candy Cane
 - Chocolate Cookie
 - Chocolate Praline
-- CAT
+- Confetto
 - Gummy Bear
 - Hazelnut Truffle
 - Licorice Sandwich
@@ -85,6 +85,11 @@ Note that the category names are **case- and space-insensitive**.
 ## Train A Model
 
 We provide a naive auto-encoder implementation to train a model on the Eyecandies dataset within the Pipelime framework.
+
+> **Warning**
+>
+> **This naive auto-encoder is not the one deployed in the paper and it is not meant to be used in practice!**
+
 Just create your context by copying `dags/ctx_template.yaml` and filling the missing variables, namely:
 - `data.root`: the root folder of the Eyecandies dataset
 - `data.name`: the name of the category
