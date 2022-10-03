@@ -73,3 +73,33 @@ Download individual classes separately:
 
 </div>
 </div>
+
+# DATASET FOLDER FORMAT
+
+<div class="hero has-text-centered" id="format">
+<div class="myWrapper" markdown="1" align="left">
+
+Each object class folder contains a train dataset, a validation dataset, a public dataset and a private dataset (with no groundtruths).<br/>
+For each dataset each sample is composed by the following items:
+- 📂train:
+
+    - 📜*_object_params.yml: parameters for the replicability of the object render
+    - 📜*_pose.txt: camera pose
+    - 📷*_image_0.png: RGB image with all spotlights on
+    - 📷*_image_1.png: RGB image with bottom spot on
+    - 📷*_image_2.png: RGB image with right spot on
+    - 📷*_image_3.png: RGB image with top spot on
+    - 📷*_image_4.png: RGB image with left spot on
+    - 📷*_image_5.png: RGB image with all spotlights and camera light on
+    - 📷*_depth.png: depth image
+    - 📜*_info_depth.yml: parameters for the denormalization of the depth image
+    - 📷*_normals.png: normals map image
+    - 📜*_metadata.yml: GT labels
+    - 📷*_normals_mask.png: GT normals mask
+    - 📷*_bumps_mask.png: GT bumps mask
+    - 📷*_colors_mask.png: GT colors mask
+    - 📷*_dimples_mask.png: GT dimples mask
+    - 📷*_mask.png: GT mask composition of all types of anomalies 
+
+</div>
+</div>
