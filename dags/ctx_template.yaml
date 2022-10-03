@@ -1,0 +1,27 @@
+data:
+  root:
+  name:
+  image_size: 256
+  test_sets:
+    - public
+    - private
+result_folder:
+training:
+  repeat: 1
+  batch: 64
+  num_workers: 4
+  prefetch: 2
+  device: cuda
+  epochs: 10
+  lr: 0.001
+predict:
+  batch: 64
+  num_workers: 4
+  prefetch: 2
+  device: cuda
+metrics:
+  nbins: 100
+  px_maxfpr:
+  img_maxfpr:
+  nproc: 0
+  prefetch: 2

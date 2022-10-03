@@ -1,4 +1,4 @@
 ec-get:
-  category: $var(category, default="")
-  output: $var(data_root)
+  category: $var(data.name)
+  output: $var(data.root)
   skip_existing: true

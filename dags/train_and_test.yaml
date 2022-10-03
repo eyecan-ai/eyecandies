@@ -1,3 +1,0 @@
-nodes:
-    train: $import("ec-train.yaml")
-    test: $import("ec-test.yaml")

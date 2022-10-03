@@ -16,7 +16,7 @@ This repository contains sample code to download and use the Eyecandies dataset 
 >
 > **This package is just an example on how to use the Eyecandies dataset and it is not meant to reproduce the results in the paper.**
 
-## Getting Started
+## Get Started
 
 Installing the package brings in everything you need to download and use the Eyecandies dataset.
 However, it is better to first create a virtual environment and install `pytorch` following the instructions on the [official website](https://pytorch.org/get-started/locally/). For instance, to get `pytorch` 1.12.1 with `pip` and `venv` on Linux:
@@ -42,13 +42,13 @@ $ pip install -e eyecandies
 
 This package is built on top of [Pipelime](https://github.com/eyecan-ai/pipelime-python/).
 You can find more information about Pipelime and its features in the [documentation](https://pipelime-python.readthedocs.io).
-For example, the available *pipelime* commands in this package are listed with:
+For example, you can list the available *pipelime* commands in this package with:
 
 ```bash
 $ pipelime -m eyecandies list
 ```
 
-Then to see the help for a specific command, e.g. `ec-get`:
+Then, to see the help for a specific command, e.g. `ec-get`:
 
 ```bash
 $ pipelime -m eyecandies help ec-get
@@ -56,15 +56,19 @@ $ pipelime -m eyecandies help ec-get
 
 ## Download The Dataset
 
-First, you should download the dataset. You can do it with the following command:
+First, you should download the dataset. You can either get them one by one:
 
 ```bash
-$ pipelime -m eyecandies ec-get [+category <name_0> +category <name_1> ...]  +output <folder>
+$ pipelime -m eyecandies ec-get +o <output_root_folder> +c <category_name>
 ```
 
-where `folder` is the path to the folder where you want to download the dataset,
-while `name_0`, `name_1`, ... are the names of the categories you want to download.
-Choose among the following, or leave empty to download all categories:
+or download all the categories at once:
+
+```bash
+$ pipelime -m eyecandies ec-get +o <output_root_folder>
+```
+
+already downloaded categories will be skipped, of course. Here a list of the available categories:
 - Candy Cane
 - Chocolate Cookie
 - Chocolate Praline
@@ -76,4 +80,8 @@ Choose among the following, or leave empty to download all categories:
 - Marshmallow
 - Peppermint Candy
 
-Note that the category names are case- and space-insensitive.
+Note that the category names are **case- and space-insensitive**.
+
+## Train A Model
+
+We provide a naive auto-encoder implementation to train a model on the Eyecandies dataset within the Pipelime framework.

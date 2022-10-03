@@ -1,8 +1,9 @@
 import typing as t
+from pathlib import Path
 
 from pipelime.commands.interfaces import InputDatasetInterface, GrabberInterface
 from pipelime.piper import PipelimeCommand, PiperPortType
-from pydantic import Field, DirectoryPath
+from pydantic import Field
 
 
 class _StatAggregator:
@@ -79,14 +80,18 @@ class ComputeMetricsCommand(PipelimeCommand, title="ec-metrics"):
     )
 
     # OUTPUT
-    output_folder: DirectoryPath = Field(
+    output_folder: Path = Field(
         ...,
         alias="o",
-        description="The folder where the output CSV file will be written.",
+        description=(
+            "The folder where the output CSV file will be written. "
+            "It will be created if it does not exist."
+        ),
         piper_port=PiperPortType.OUTPUT,
     )
 
     # PARAMETERS
+    output_prefix: str = Field("", description="The prefix of the output CSV file.")
     heatmap_key: t.Optional[str] = Field(
         "heatmap",
         description=(
@@ -281,7 +286,7 @@ class ComputeMetricsCommand(PipelimeCommand, title="ec-metrics"):
             }
 
             tpr, fpr, thr = hm_stats_agg.compute_roc(hm_thresholds)
-            with (self.output_folder / "pixel_roc.csv").open("w") as f:
+            with self._make_output("pixel_roc.csv").open("w") as f:
                 f.write("TPR,FPR,Threshold\n")
                 for trp_v, fpr_v, thr_v in zip(tpr, fpr, thr):
                     f.write(f"{float(trp_v)},{float(fpr_v)},{float(thr_v)}\n")
@@ -298,15 +303,19 @@ class ComputeMetricsCommand(PipelimeCommand, title="ec-metrics"):
             }
 
             tpr, fpr, thr = score_stats_agg.compute_roc(score_thresholds)
-            with (self.output_folder / "image_roc.csv").open("w") as f:
+            with self._make_output("image_roc.csv").open("w") as f:
                 f.write("TPR,FPR,Threshold\n")
                 for trp_v, fpr_v, thr_v in zip(tpr, fpr, thr):
                     f.write(f"{float(trp_v)},{float(fpr_v)},{float(thr_v)}\n")
 
-        with (self.output_folder / "global.yaml").open("w") as f:
+        with self._make_output("global.yaml").open("w") as f:
             yaml.safe_dump(global_meta, f)
 
     def _make_unique(self, key: str, key_list: t.List[str]) -> str:
         while key in key_list:
             key += "-"
         return key
+
+    def _make_output(self, name: str):
+        self.output_folder.mkdir(parents=True, exist_ok=True)
+        return self.output_folder / (self.output_prefix + name)

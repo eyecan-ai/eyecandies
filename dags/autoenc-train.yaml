@@ -1,17 +1,17 @@
 autoenc-train:
-  train_dataset: $var(train_folder)
-  last_ckpt: $var(result_folder)/last.ckpt
+  train_dataset: $var(data.root)/$var(data.name)/train
+  last_ckpt: $var(result_folder)/autoenc/$var(data.name)/$date('%Y-%m-%d_%H-%M-%S').ckpt
   transforms: $import(train_transforms.yaml)
-  repeat: 10
+  repeat: $var(training.repeat, default=1)
   dataloader:
-    batch_size: $var(batch, default=32)
+    batch_size: $var(training.batch, default=32)
     shuffle: true
-    num_workers: $var(num_workers, default=4)
+    num_workers: $var(training.num_workers, default=4)
     drop_last: false
-    prefecth: $var(prefetch, default=2)
-  device: $var(device, default="cuda")
-  n_epochs: $var(epochs, default=10)
-  learning_rate: 0.001
-  image_key: image
-  image_size: $var(image_size, default=256)
+    prefecth: $var(training.prefetch, default=2)
+  device: $var(training.device, default=cuda)
+  n_epochs: $var(training.epochs, default=10)
+  learning_rate: $var(training.lr, default=0.001)
+  image_key: image_0
+  image_size: $var(data.image_size, default=256)
   image_channels: 3
