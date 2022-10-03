@@ -25,15 +25,37 @@ We believe this dataset may incentivize the exploration of original approaches t
 
 ## Ten Object Classes
 
-TODO
+| Candy Cane | Chocolate cookie | Chocolate praline | Confetto | Gummy bear |
+| ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| ![Alt text](assets\images\objects\candy_cane.jpg "candy cane") | ![Alt text](assets\images\objects\chocolate_cookie.jpg "chocolate cookie") | ![Alt text](assets\images\objects\chocolate_praline.jpg "chocolate_praline") | ![Alt text](assets\images\objects\confetto.jpg "confetto") | ![Alt text](assets\images\objects\gummy_bear.jpg "gummy_bear") |
+
+<!-- this space is essential -->
+
+| Hazelnut truffle | Licorice sandwitch | Lollipop | Marshmallow | Peppermint candy |
+| ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| ![Alt text](assets\images\objects\hazelnut_truffle.jpg "hazelnut_truffle") | ![Alt text](assets\images\objects\licorice_sandwitch.jpg "licorice_sandwitch") | ![Alt text](assets\images\objects\lollipop.jpg "lollipop") | ![Alt text](assets\images\objects\marshmallow.jpg "marshmallow") | ![Alt text](assets\images\objects\peppermint_candy.jpg "peppermint candy") |
+
 
 ## Multi-Modal
 
-TODO
+
+| image_5 | depth | normals |
+| ------------------ | ------------------ | ------------------ | 
+| ![Alt text](assets\images\multimodal\image_5.jpg "image") | ![Alt text](assets\images\multimodal\depth.jpg "depth") | ![Alt text](assets\images\multimodal\normals.jpg "normals") |
+
 
 ## Multi-Light
 
-TODO
+Renderings with a single light source are rendered respectively in image_1, image_2, image_2 and image_4. 
+In image_5 all the camera lights are active.
+In image_0 the light comes instead from four spotlights at the corners of the
+surrounding lightbox, and the camera lights are switched off. 
+
+
+| image_0 | image_1 | image_2 | image_2 | image_4 |  image_5 |
+| ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| ![Alt text](assets\images\multilight\image_0.jpg "0") | ![Alt text](assets\images\multilight\image_1.jpg "1") | ![Alt text](assets\images\multilight\image_2.jpg "2") | ![Alt text](assets\images\multilight\image_3.jpg "3") | ![Alt text](assets\images\multilight\image_4.jpg "4") | ![Alt text](assets\images\multilight\image_5.jpg "5") |
+
 
 </div>
 </div>
