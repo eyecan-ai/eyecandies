@@ -72,7 +72,7 @@ already downloaded categories will be skipped, of course. Here a list of the ava
 - Candy Cane
 - Chocolate Cookie
 - Chocolate Praline
-- Confetto
+- CAT
 - Gummy Bear
 - Hazelnut Truffle
 - Licorice Sandwich
@@ -85,3 +85,43 @@ Note that the category names are **case- and space-insensitive**.
 ## Train A Model
 
 We provide a naive auto-encoder implementation to train a model on the Eyecandies dataset within the Pipelime framework.
+Just create your context by copying `dags/ctx_template.yaml` and filling the missing variables, namely:
+- `data.root`: the root folder of the Eyecandies dataset
+- `data.name`: the name of the category
+- `result_folder`: the output folder
+
+Then, run the full pipeline with:
+
+```bash
+$ pipelime -m eyecandies run --config dags/train_predict_stats.yaml --context dags/context.yaml
+```
+
+To understand what's going on, the pipeline can be drawn (you need `Graphviz` installed, see [Pipelime documentation](https://pipelime-python.readthedocs.io/en/latest/get_started/installation.html) for more info):
+
+```bash
+$ pipelime -m eyecandies draw --config dags/train_predict_stats.yaml --context dags/context.yaml
+```
+
+```mermaid
+flowchart TB
+    classDef operation fill:#03A9F4,stroke:#fafafa,color:#fff;
+    classDef data fill:#009688,stroke:#fafafa,color:#fff;
+    path/to/CATEGORY/test_public[("path/to/&lt;CATEGORY&gt;/test_public")]:::data-->|test_dataset|predict_public:::operation
+    path/to/CATEGORY/test_public[("path/to/&lt;CATEGORY&gt;/test_public")]:::data-->|targets|stats:::operation
+    predict_public:::operation-->|predictions|path/to/results/autoenc/CATEGORY/DATE_test_public[("path/to/results/autoenc/&lt;CATEGORY&gt;/&lt;DATE&gt;_test_public")]:::data
+    path/to/results/autoenc/CATEGORY/DATE.ckpt[("path/to/results/autoenc/&lt;CATEGORY&gt;/&lt;DATE&gt;.ckpt")]:::data-->|ckpt|predict_public:::operation
+    path/to/results/autoenc/CATEGORY/DATE.ckpt[("path/to/results/autoenc/&lt;CATEGORY&gt;/&lt;DATE&gt;.ckpt")]:::data-->|ckpt|predict_private:::operation
+    path/to/results/autoenc/CATEGORY/DATE_test_public[("path/to/results/autoenc/&lt;CATEGORY&gt;/&lt;DATE&gt;_test_public")]:::data-->|predictions|stats:::operation
+    path/to/CATEGORY/test_private[("path/to/&lt;CATEGORY&gt;/test_private")]:::data-->|test_dataset|predict_private:::operation
+    predict_private:::operation-->|predictions|path/to/results/autoenc/CATEGORY/DATE_test_private[("path/to/results/autoenc/&lt;CATEGORY&gt;/&lt;DATE&gt;_test_private")]:::data
+    path/to/CATEGORY/train[("path/to/&lt;CATEGORY&gt;/train")]:::data-->|train_dataset|train:::operation
+    train:::operation-->|last_ckpt|path/to/results/autoenc/CATEGORY/DATE.ckpt[("path/to/results/autoenc/&lt;CATEGORY&gt;/&lt;DATE&gt;.ckpt")]:::data
+    stats:::operation-->|output_folder|path/to/results/autoenc/CATEGORY[("path/to/results/autoenc/&lt;CATEGORY&gt")]:::data
+```
+
+As you can see, the pipeline is composed of three main steps:
+1. **autoenc-train**: the autoencoder is trained and a checkpoint is produced
+2. **autoenc-predict**: the trained model predicts anomaly heatmaps on the public and private test set
+3. **ec-metrics**: ROC and AUROC are computed on the predictions using the public ground truth
+
+To get the results on any other method, just replace the first two nodes, then run **ec-metrics** on the new predictions. Note that results are given for the public test set only: to get the results on the private test set, please follow the instructions on the [Eyecandies website](https://eyecan-ai.github.io/eyecandies/).
