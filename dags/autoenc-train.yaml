@@ -1,4 +1,4 @@
-ec-train:
+autoenc-train:
   train_dataset: $var(train_folder)
   last_ckpt: $var(result_folder)/last.ckpt
   transforms: $import(train_transforms.yaml)

@@ -7,8 +7,8 @@ from pipelime.piper import PipelimeCommand, PiperPortType
 from pydantic import Field
 
 
-class PredictCommand(PipelimeCommand, title="ec-predict"):
-    """Compute predictions on a test dataset."""
+class PredictCommand(PipelimeCommand, title="autoenc-predict"):
+    """Compute predictions on a test dataset with a naive autoencoder."""
 
     # INPUT
     test_dataset: InputDatasetInterface = InputDatasetInterface.pyd_field(

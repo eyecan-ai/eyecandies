@@ -8,8 +8,8 @@ from pydantic import Field, PositiveInt, PositiveFloat
 from eyecandies.commands.utils import DataLoaderOptions
 
 
-class TrainCommand(PipelimeCommand, title="ec-train"):
-    """Train a simple autoencoder."""
+class TrainCommand(PipelimeCommand, title="autoenc-train"):
+    """Train a simple autoencoder on the eyecandies dataset."""
 
     # INPUT
     train_dataset: InputDatasetInterface = InputDatasetInterface.pyd_field(

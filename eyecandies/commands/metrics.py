@@ -63,7 +63,7 @@ class _StatAggregator:
 
 class ComputeMetricsCommand(PipelimeCommand, title="ec-metrics"):
     """Compute metrics on given predictions and groundtruth.
-    The predictions should include a heatmap and/or classification score.
+    The predictions should include a heatmap and/or a classification score.
     """
 
     # INPUT

@@ -1,5 +1,6 @@
-ec-predict:
-  test_dataset: $var(test_folder)
+autoenc-test:
+  good_dataset: $var(test_good_folder)
+  bad_dataset: $var(test_bad_folder)
   ckpt: $var(result_folder)/last.ckpt
   predictions: $var(result_folder)/test_prediction
   dataloader:
