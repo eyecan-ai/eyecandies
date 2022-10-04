@@ -1,15 +1,15 @@
 - name: Luca Bonfiglioli
   email: luca.bonfiglioli@eyecan.ai
   pic: https://media-exp1.licdn.com/dms/image/C4E03AQFjbeXYpIPceg/profile-displayphoto-shrink_800_800/0/1652864847561?e=1670457600&v=beta&t=ThY2GelqQegkwoV2oMUgjp3frYa9ijx5c789s6a0CO0
-- name: Daniele De Gregorio
-  email: daniele.degregorio@eyecan.ai
-  pic: https://media-exp1.licdn.com/dms/image/C4D03AQEJ_ct7xWvq2Q/profile-displayphoto-shrink_800_800/0/1659178616148?e=1670457600&v=beta&t=9SNKc_LPPkf3EwsbjaibUYsJ01keVPcaZEJ8dJ1Jass
-- name: Nicola Fioraio
-  email: nicola.fioraio@eyecan.ai
-  pic: https://media-exp1.licdn.com/dms/image/C4E03AQEizuNn1G55Gg/profile-displayphoto-shrink_800_800/0/1638141722226?e=1670457600&v=beta&t=S_qsPDJq_V5LHs9o4UTKbmJmYM7QuxxUC5puNnt9h_g
-- name: Davide Silvestri
-  email: davide.silvestri@eyecan.ai
-  pic: https://media-exp1.licdn.com/dms/image/C4D03AQHYhJi407LE1g/profile-displayphoto-shrink_800_800/0/1648830964136?e=1670457600&v=beta&t=Gu7lR4ggs2x3T-H1-Qtq0uwynaTPymqKbPI2QohLYRI
 - name: Marco Toschi
   email: marco.toschi@eyecan.ai
   pic: https://media-exp1.licdn.com/dms/image/C4D03AQEt822jX1r_Gw/profile-displayphoto-shrink_800_800/0/1663274903523?e=1670457600&v=beta&t=G_AAik8_IIn-WsY3_yV2N_gL684wZH9LSSAeLb0DOoM
+- name: Davide Silvestri
+  email: davide.silvestri@eyecan.ai
+  pic: https://media-exp1.licdn.com/dms/image/C4D03AQHYhJi407LE1g/profile-displayphoto-shrink_800_800/0/1648830964136?e=1670457600&v=beta&t=Gu7lR4ggs2x3T-H1-Qtq0uwynaTPymqKbPI2QohLYRI
+- name: Nicola Fioraio
+  email: nicola.fioraio@eyecan.ai
+  pic: https://media-exp1.licdn.com/dms/image/C4E03AQEizuNn1G55Gg/profile-displayphoto-shrink_800_800/0/1638141722226?e=1670457600&v=beta&t=S_qsPDJq_V5LHs9o4UTKbmJmYM7QuxxUC5puNnt9h_g
+- name: Daniele De Gregorio
+  email: daniele.degregorio@eyecan.ai
+  pic: https://media-exp1.licdn.com/dms/image/C4D03AQEJ_ct7xWvq2Q/profile-displayphoto-shrink_800_800/0/1659178616148?e=1670457600&v=beta&t=9SNKc_LPPkf3EwsbjaibUYsJ01keVPcaZEJ8dJ1Jass

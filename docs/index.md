@@ -9,7 +9,8 @@ layout: default
 
 **[The Eyecandies Dataset for Unsupervised Multimodal Anomaly Detection and Localization](#)**
 
-***Luca Bonfiglioli, Daniele De Gregorio, Nicola Fioraio, Davide Silvestri, Marco Toschi***
+***Luca Bonfiglioli\*, Marco Toschi\*, Davide Silvestri, Nicola Fioraio, Daniele De Gregorio***<br>
+*\* Equal contribution*
 
 We present Eyecandies, a novel synthetic dataset for unsupervised anomaly detection and localization. Photo-realistic images of procedurally generated candies are rendered in a controlled environment under multiple lightning conditions, also providing depth and normal maps in an industrial conveyor scenario. We make available anomaly-free samples for model training and validation, while anomalous instances with precise ground-truth annotations are provided only in the test set. The dataset comprises ten classes of candies, each showing different challenges, such as complex textures, self-occlusions and specularities. Furthermore, we achieve large intra-class variation by randomly drawing key parameters of a procedural rendering pipeline, which enables the creation of an arbitrary number of instances with photo-realistic appearance. Likewise, anomalies are injected into the rendering graph and pixel-wise annotations are automatically generated, overcoming human-biases and possible inconsistencies.
 
@@ -66,26 +67,25 @@ We believe this dataset may incentivize the exploration of original approaches t
 
 # LEADERBOARD
 
-<div class="hero has-text-centered" id="leaderboard">
-<div class="myWrapper" align="left" markdown="1">
+<div class="hero" id="leaderboard" markdown="1">
 <table>
     <tr>
-        <td>Category</td>
+        <td>Method</td>
         <td>Avg.</td>
-        <td>Candy Cane</td>
-        <td>Chocolate Cookie</td>
-        <td>Chocolate Praline</td>
-        <td>Confetto</td>
-        <td>Gummy Bear</td>
-        <td>Hazelnut Truffle</td>
-        <td>Licorice Sandwich</td>
-        <td>Lollipop</td>
-        <td>Marshmallow</td>
-        <td>Peppermint Candy</td>
+        <td>Can. C.</td>
+        <td>Cho. C.</td>
+        <td>Cho. P.</td>
+        <td>Confet.</td>
+        <td>Gum. B.</td>
+        <td>Haz. T.</td>
+        <td>Lic. S.</td>
+        <td>Lollip.</td>
+        <td>Marsh.</td>
+        <td>Pep. C.</td>
     </tr>
-    {% for method in site.data.leaderboard.methods_results %}
+    {% for method in site.data.leaderboard %}
         <tr>
-            <td>{{method.method_name}}</td>
+            <td>{{method.name}}</td>
             <td>{{method.avg_auc}}</td>
             {% for auc in method.aucs %}
                 <td>{{auc}}</td>
@@ -94,6 +94,9 @@ We believe this dataset may incentivize the exploration of original approaches t
     {% endfor %}
 </table>
 
+<br>
+<div class="myWrapper" align="left" markdown="1">
+
 ## Submit Your Results
 
 Send us your results on the private test set so we can add your method to our leaderboard!
@@ -101,25 +104,10 @@ Send us your results on the private test set so we can add your method to our le
 To do so, send an e-mail to **luca.bonfiglioli@eyecan.ai** with subject "Eyecandies results submission" and the following info:
 
 - The **name**/s of your method/s.
-- A link to a published **paper** describing it/them. Papers that are not peer-reviewed and published in mainstream conferences/journals will be ignored.
-- A [Pipelime](https://github.com/eyecan-ai/pipelime-python.git) underfolder for every proposed method, containing predicted heatmaps for every test set sample. We will compute metrics on those heatmaps. More details below.
+- A link to a published **paper** describing it/them. 
+- A download link with your results for every proposed method, with predicted heatmaps for every test set sample. We will compute metrics on those heatmaps.
 
-### Results format
-
-Results must be submitted as a pipelime **underfolder** dataset. You can create it using pipelime (recommended) or manually - they are basically .npy files inside a folder with the following directory structure:
-
-- 📁 `my_folder` - (name it as you want)
-
-  - 📁 `data`
-  
-    - 📄 `000_heatmap.npy`
-    - 📄 `001_heatmap.npy`
-    - 📄 `002_heatmap.npy`
-    - You get the idea...
-
-**Order matters** - Every heatmap file refers to the corresponding sample from the private test set, please keep them in the same order!
-
-Every heatmap file should contain a H×W numpy float array with per-pixel anomaly scores. If your method does not support localization, you can send 1×1 heatmaps with just a single value. Values should not be normalized, meaning they can lie in whatever range you want, since AUC metrics are threshold-independent. 
+Download the [template submission](https://drive.google.com/file/d/17qTSfqFesnb5BG6BdgegjWLv7bHKJJMs/view?usp=sharing) for more info on how to create your own.
 
 Take a look at the [Eyecandies](https://github.com/eyecan-ai/eyecandies.git) repo for examples and tutorials and feel free to ask us questions!
 
