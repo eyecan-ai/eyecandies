@@ -128,3 +128,4 @@ As you can see, the pipeline is composed of three main steps:
 3. **ec-metrics**: ROC and AUROC are computed on the predictions using the public ground truth
 
 To get the results on any other method, just replace the first two nodes, then run **ec-metrics** on the new predictions. Note that results are given for the public test set only: to get the results on the private test set as well, please follow the instructions on the [Eyecandies website](https://eyecan-ai.github.io/eyecandies/).
+ 
