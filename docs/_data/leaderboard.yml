@@ -11,7 +11,7 @@ methods_results:
     - 0.665
     - <b>0.987</b>
     - <b>0.924</b>
-  avg_auc: 0.794
+  avg_auc: <b>0.794</b>
 - method_name: padim(resnet18)
   aucs:
     - 0.537
