@@ -4,7 +4,7 @@ from pathlib import Path
 from eyecandies.commands.utils import DataLoaderOptions, image_tensor_to_numpy
 from pipelime.commands.interfaces import InputDatasetInterface, OutputDatasetInterface
 from pipelime.piper import PipelimeCommand, PiperPortType
-from pydantic import Field
+from pydantic import Field, PositiveInt
 
 
 class PredictCommand(PipelimeCommand, title="autoenc-predict"):
@@ -36,13 +36,13 @@ class PredictCommand(PipelimeCommand, title="autoenc-predict"):
     )
     device: str = Field("cuda", description="The device to use for testing.")
     image_key: str = Field("image", description="The key of the image in the dataset.")
-    image_size: int = Field(
+    image_size: PositiveInt = Field(
         256,
         description=(
             "Images will be rescaled to this size just before feeding the network."
         ),
     )
-    image_channels: int = Field(
+    image_channels: PositiveInt = Field(
         3, description="Number of channels of the input images."
     )
 

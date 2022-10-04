@@ -1,5 +1,5 @@
 import typing as t
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PositiveInt, NonNegativeInt
 
 if t.TYPE_CHECKING:
     import torch
@@ -7,15 +7,15 @@ if t.TYPE_CHECKING:
 
 
 class DataLoaderOptions(BaseModel):
-    batch_size: int = Field(32, description="The batch size.")
+    batch_size: PositiveInt = Field(32, description="The batch size.")
     shuffle: bool = Field(False, description="Whether to shuffle the dataset.")
-    num_workers: int = Field(
+    num_workers: NonNegativeInt = Field(
         4, description="How many subprocesses to use for data loading."
     )
     drop_last: bool = Field(
         False, description="Whether to drop the last incomplete batch."
     )
-    prefecth: int = Field(
+    prefecth: PositiveInt = Field(
         2, description="Number of batches loaded in advance by each worker."
     )
 

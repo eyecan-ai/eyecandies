@@ -4,6 +4,7 @@ from pipelime.stages import SampleStage
 from pydantic import Field
 
 if t.TYPE_CHECKING:
+    import torch
     from pipelime.sequences import Sample
 
 
@@ -11,11 +12,18 @@ class ComputeStatsStage(SampleStage, title="stats"):
     """Computes TP, FP, TN, FN statistics for each sample."""
 
     hm_thresholds: t.Optional[t.List[float]] = Field(
-        ..., description="The thresholds to use to compute the heatmap statistics."
+        ...,
+        description=(
+            "The thresholds to use to compute the heatmap statistics. Set to "
+            "an empty list to use all the values or None to skip the computation."
+        ),
     )
     score_thresholds: t.Optional[t.List[float]] = Field(
         ...,
-        description="The thresholds to use to compute the anomaly score statistics.",
+        description=(
+            "The thresholds to use to compute the anomaly score statistics. Set to "
+            "an empty list to use all the values or None to skip the computation."
+        ),
     )
 
     heatmap_key: str = Field("heatmap", description="The key of the heatmap.")
@@ -44,8 +52,6 @@ class ComputeStatsStage(SampleStage, title="stats"):
         import torch
         import numpy as np
         import cv2
-        from pipelime.items import TxtNumpyItem
-        from eyecandies.modules.binned_roc import BinnedROC
 
         if (
             self.hm_thresholds is not None
@@ -55,50 +61,87 @@ class ComputeStatsStage(SampleStage, title="stats"):
             hm: np.ndarray = x[self.heatmap_key]().squeeze()  # type: ignore
             mask = (x[self.mask_key]().squeeze() != 0).astype(np.int32)  # type: ignore
 
+            # resize the mask to the heatmap size
             if mask.shape != hm.shape:
                 mask = cv2.resize(mask, hm.shape[::-1], interpolation=cv2.INTER_NEAREST)
 
-            hm_roc = BinnedROC(num_classes=1, thresholds=self.hm_thresholds)
+            # flatten, so that each pixel is a sample
             preds = torch.tensor(hm.reshape(-1))
             targets = torch.tensor(mask.reshape(-1))
-            hm_roc.update(preds, targets)
-            x = x.set_item(
-                self.hm_stat_key_format.replace("*", "TP"),
-                TxtNumpyItem(hm_roc.TPs.numpy()),
-            )
-            x = x.set_item(
-                self.hm_stat_key_format.replace("*", "FP"),
-                TxtNumpyItem(hm_roc.FPs.numpy()),
-            )
-            x = x.set_item(
-                self.hm_stat_key_format.replace("*", "TN"),
-                TxtNumpyItem(hm_roc.TNs.numpy()),
-            )
-            x = x.set_item(
-                self.hm_stat_key_format.replace("*", "FN"),
-                TxtNumpyItem(hm_roc.FNs.numpy()),
-            )
 
-        if self.score_thresholds is not None and self.anomaly_score_key in x:
-            score_roc = BinnedROC(num_classes=1, thresholds=self.score_thresholds)
+            if len(self.hm_thresholds) > 0:
+                x = self._update_binnedroc(
+                    x, preds, targets, self.hm_thresholds, self.hm_stat_key_format
+                )
+            else:
+                x = self._update_roc(x, preds, targets, self.hm_stat_key_format)
+
+        if (
+            self.score_thresholds is not None
+            and self.anomaly_score_key in x
+            and self.label_key in x
+        ):
             preds = torch.tensor(x[self.anomaly_score_key]())
             targets = torch.tensor(x[self.label_key]().astype(np.int32))  # type: ignore
-            score_roc.update(preds, targets)
-            x = x.set_item(
-                self.score_stat_key_format.replace("*", "TP"),
-                TxtNumpyItem(score_roc.TPs.numpy()),
-            )
-            x = x.set_item(
-                self.score_stat_key_format.replace("*", "FP"),
-                TxtNumpyItem(score_roc.FPs.numpy()),
-            )
-            x = x.set_item(
-                self.score_stat_key_format.replace("*", "TN"),
-                TxtNumpyItem(score_roc.TNs.numpy()),
-            )
-            x = x.set_item(
-                self.score_stat_key_format.replace("*", "FN"),
-                TxtNumpyItem(score_roc.FNs.numpy()),
-            )
 
+            if len(self.score_thresholds) > 0:
+                x = self._update_binnedroc(
+                    x, preds, targets, self.score_thresholds, self.score_stat_key_format
+                )
+            else:
+                x = self._update_roc(x, preds, targets, self.score_stat_key_format)
+
+        return x
+
+    def _update_roc(
+        self,
+        x: "Sample",
+        preds: "torch.Tensor",
+        targets: "torch.Tensor",
+        key_format: str,
+    ) -> "Sample":
+        from torchmetrics import ROC  # type: ignore
+        from pipelime.items import NpyNumpyItem
+
+        roc = ROC()
+        roc.update(preds, targets)
+        x = x.set_item(
+            key_format.replace("*", "preds"),
+            NpyNumpyItem([tn.numpy() for tn in roc.preds]),  # type: ignore
+        )
+        x = x.set_item(
+            key_format.replace("*", "target"),
+            NpyNumpyItem([tn.numpy() for tn in roc.target]),  # type: ignore
+        )
+        return x
+
+    def _update_binnedroc(
+        self,
+        x: "Sample",
+        preds: "torch.Tensor",
+        targets: "torch.Tensor",
+        thresholds: t.List[float],
+        key_format: str,
+    ) -> "Sample":
+        from pipelime.items import NpyNumpyItem
+        from eyecandies.modules.binned_roc import BinnedROC
+
+        roc = BinnedROC(num_classes=1, thresholds=thresholds)
+        roc.update(preds, targets)
+        x = x.set_item(
+            key_format.replace("*", "TPs"),
+            NpyNumpyItem(roc.TPs.numpy()),
+        )
+        x = x.set_item(
+            key_format.replace("*", "FPs"),
+            NpyNumpyItem(roc.FPs.numpy()),
+        )
+        x = x.set_item(
+            key_format.replace("*", "TNs"),
+            NpyNumpyItem(roc.TNs.numpy()),
+        )
+        x = x.set_item(
+            key_format.replace("*", "FNs"),
+            NpyNumpyItem(roc.FNs.numpy()),
+        )
         return x
