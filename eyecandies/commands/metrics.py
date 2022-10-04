@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 from pipelime.commands.interfaces import InputDatasetInterface, GrabberInterface
 from pipelime.piper import PipelimeCommand, PiperPortType
-from pydantic import Field, PositiveInt
+from pydantic import BaseModel, Field, PositiveInt
 
 
 class _StatAggregator(ABC):
@@ -105,6 +105,27 @@ class _BinnedStatAggregator(_StatAggregator):
         )
 
 
+class MappedOutput(BaseModel):
+    data: t.Mapping[str, t.Any]
+
+    def __repr__(self) -> str:
+        return self.__piper_repr__()
+
+    def __piper_repr__(self) -> str:
+        from io import StringIO
+        from rich.console import Console
+        from rich.table import Table
+
+        table = Table(show_header=False)
+        for k, v in self.data.items():
+            table.add_row(k, str(v))
+
+        strout = StringIO()
+        console = Console(file=strout)
+        console.print(table)
+        return strout.getvalue()
+
+
 class ComputeMetricsCommand(PipelimeCommand, title="ec-metrics"):
     """Compute metrics on given predictions and groundtruth.
     The predictions should include a heatmap and/or a classification score.
@@ -130,6 +151,13 @@ class ComputeMetricsCommand(PipelimeCommand, title="ec-metrics"):
             "The folder where the output CSV file will be written. "
             "It will be created if it does not exist."
         ),
+        piper_port=PiperPortType.OUTPUT,
+    )
+    output_global_stats: t.Optional[MappedOutput] = Field(
+        None,
+        description="Final global statistics.",
+        exclude=True,
+        repr=False,
         piper_port=PiperPortType.OUTPUT,
     )
 
@@ -240,44 +268,38 @@ class ComputeMetricsCommand(PipelimeCommand, title="ec-metrics"):
         # zip the samples toghether and cache
         test_seq = pred_seq.zip(gt_seq).cache()
 
-        # compute the ranges of the heatmaps and the anomaly scores
-        good_count, bad_count = 0, 0
         hm_range, score_range = (np.inf, -np.inf), (np.inf, -np.inf)
-        hm_range_key = self._make_unique("hm_range", effective_keys)
-        effective_keys.append(hm_range_key)
+        if self.nbins:
+            # compute the ranges of the heatmaps and the anomaly scores
+            hm_range_key = self._make_unique("hm_range", effective_keys)
+            effective_keys.append(hm_range_key)
 
-        def _update_ranges(x):
-            nonlocal good_count, bad_count, hm_range, score_range
-
-            if x[gt_label_key]() == 0:
-                bad_count += 1
-            else:
-                good_count += 1
-
-            if self.heatmap_key:
-                hmr = x[hm_range_key]()
-                hm_range = (
-                    min(hm_range[0], float(hmr[0])),
-                    max(hm_range[1], float(hmr[1])),
+            def _update_ranges(x):
+                nonlocal hm_range, score_range
+                if self.heatmap_key:
+                    hmr = x[hm_range_key]()
+                    hm_range = (
+                        min(hm_range[0], float(hmr[0])),
+                        max(hm_range[1], float(hmr[1])),
+                    )
+                score_range = (
+                    min(score_range[0], float(x[anomaly_score_key]())),
+                    max(score_range[1], float(x[anomaly_score_key]())),
                 )
-            score_range = (
-                min(score_range[0], float(x[anomaly_score_key]())),
-                max(score_range[1], float(x[anomaly_score_key]())),
-            )
 
-        self.grabber.grab_all(
-            test_seq.map(
-                ecst.ComputeMinMax(
-                    heatmap_key=self.heatmap_key, minmax_key=hm_range_key
+            self.grabber.grab_all(
+                test_seq.map(
+                    ecst.ComputeMinMax(
+                        heatmap_key=self.heatmap_key, minmax_key=hm_range_key
+                    )
                 )
+                if self.heatmap_key
+                else test_seq,
+                keep_order=False,
+                parent_cmd=self,
+                track_message=f"Computing ranges ({len(test_seq)} samples)",
+                sample_fn=_update_ranges,
             )
-            if self.heatmap_key
-            else test_seq,
-            keep_order=False,
-            parent_cmd=self,
-            track_message=f"Computing ranges ({len(test_seq)} samples)",
-            sample_fn=_update_ranges,
-        )
 
         if not self.heatmap_key:
             hm_thresholds = None
@@ -308,7 +330,15 @@ class ComputeMetricsCommand(PipelimeCommand, title="ec-metrics"):
             else _PlainStatAggregator(score_stats)
         )
 
+        good_count, bad_count = 0, 0
+
         def _update_stats(x):
+            nonlocal good_count, bad_count
+            if x[gt_label_key]() == 0:
+                bad_count += 1
+            else:
+                good_count += 1
+
             nonlocal hm_stats_agg, score_stats_agg
             hm_stats_agg.update(x)
             score_stats_agg.update(x)
@@ -372,8 +402,7 @@ class ComputeMetricsCommand(PipelimeCommand, title="ec-metrics"):
                 for trp_v, fpr_v, thr_v in zip(tpr, fpr, thr):
                     f.write(f"{float(trp_v)},{float(fpr_v)},{float(thr_v)}\n")
 
-        with self._make_output("global.yaml").open("w") as f:
-            yaml.safe_dump(global_meta, f)
+        self.output_global_stats = MappedOutput(data=global_meta)
 
     def _make_unique(self, key: str, key_list: t.List[str]) -> str:
         while key in key_list:
