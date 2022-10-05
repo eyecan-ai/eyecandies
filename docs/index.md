@@ -70,26 +70,26 @@ We believe this dataset may incentivize the exploration of original approaches t
 <div class="hero" id="leaderboard" markdown="1">
 <table>
     <tr>
-        <td>Method</td>
-        <td>Avg.</td>
-        <td>Can. C.</td>
-        <td>Cho. C.</td>
-        <td>Cho. P.</td>
-        <td>Confet.</td>
-        <td>Gum. B.</td>
-        <td>Haz. T.</td>
-        <td>Lic. S.</td>
-        <td>Lollip.</td>
-        <td>Marsh.</td>
-        <td>Pep. C.</td>
+        <td><b>Method</b></td>
+        <td><b>Can. C.</b></td>
+        <td><b>Cho. C.</b></td>
+        <td><b>Cho. P.</b></td>
+        <td><b>Confet.</b></td>
+        <td><b>Gum. B.</b></td>
+        <td><b>Haz. T.</b></td>
+        <td><b>Lic. S.</b></td>
+        <td><b>Lollip.</b></td>
+        <td><b>Marsh.</b></td>
+        <td><b>Pep. C.</b></td>
+        <td><b>Avg.</b></td>
     </tr>
     {% for method in site.data.leaderboard %}
         <tr>
             <td>{{method.name}}</td>
-            <td>{{method.avg_auc}}</td>
             {% for auc in method.aucs %}
                 <td>{{auc}}</td>
             {% endfor %}
+            <td>{{method.avg_auc}}</td>
         </tr>
     {% endfor %}
 </table>
