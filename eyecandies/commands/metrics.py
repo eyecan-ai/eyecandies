@@ -65,15 +65,30 @@ class _PlainStatAggregator(_StatAggregator):
         return value if current is None else current + value
 
     def compute_roc(self):
+        import warnings
         from torchmetrics import ROC  # type: ignore
 
-        return self._internal_compute(ROC(num_classes=1, pos_label=1))
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                action="ignore",
+                message=".*will save all targets and predictions in buffer.*",
+                category=UserWarning,
+            )
+            roc = ROC(num_classes=1, pos_label=1)
+        return self._internal_compute(roc)
 
     def compute_auroc(self, max_fpr):
+        import warnings
         from torchmetrics import AUROC  # type: ignore
         from torchmetrics.utilities.enums import DataType
 
-        auroc = AUROC(num_classes=1, pos_label=1, max_fpr=max_fpr)
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                action="ignore",
+                message=".*will save all targets and predictions in buffer.*",
+                category=UserWarning,
+            )
+            auroc = AUROC(num_classes=1, pos_label=1, max_fpr=max_fpr)
         auroc.mode = DataType.BINARY
         return self._internal_compute(auroc)
 
@@ -189,7 +204,8 @@ class ComputeMetricsCommand(PipelimeCommand, title="ec-metrics"):
         description=(
             "Compute the ROC curve at `nbins` thresholds linearly sampled "
             "between the minimum and maximum values. "
-            "Leave empty to use all the values."
+            "Leave empty to use all the values "
+            "(WARNING: this may lead to large memory footprint)."
         ),
     )
 

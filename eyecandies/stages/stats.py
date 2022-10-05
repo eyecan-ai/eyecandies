@@ -100,10 +100,17 @@ class ComputeStatsStage(SampleStage, title="stats"):
         targets: "torch.Tensor",
         key_format: str,
     ) -> "Sample":
+        import warnings
         from torchmetrics import ROC  # type: ignore
         from pipelime.items import NpyNumpyItem
 
-        roc = ROC()
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                action="ignore",
+                message=".*will save all targets and predictions in buffer.*",
+                category=UserWarning,
+            )
+            roc = ROC()
         roc.update(preds, targets)
         x = x.set_item(
             key_format.replace("*", "preds"),
