@@ -109,7 +109,7 @@ To do so, send an e-mail to **info@eyecan.ai** with subject "Eyecandies results 
 - A link to a published **paper** describing it/them.
 - A download link with your results for every proposed method, with predicted heatmaps for every test set sample. We will compute metrics on those heatmaps.
 
-Download the [template submission](https://drive.google.com/file/d/17qTSfqFesnb5BG6BdgegjWLv7bHKJJMs/view?usp=sharing) for more info on how to create your own and take a look at the [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo for examples and tutorials.
+Download the [template submission](https://drive.google.com/file/d/17qTSfqFesnb5BG6BdgegjWLv7bHKJJMs/view?usp=sharing) for more info on how to create your own and take a look at the [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo for examples and tutorials. The dataset is formatted as a Pipelime underfolder, so take a look at [Pipelime](https://github.com/eyecan-ai/pipelime-python) as well!
 
 Feel free to ask us any questions!
 
