@@ -141,7 +141,7 @@ $ pipelime -m eyecandies.stages map +s depth2mt +i path/to/eyecandies/dataset +o
 The output dataset has, for each sample, a `depth.npy` item, which is a float32 depth map in meters.
 Note that all other files are **hard-linked**, so no extra space is used.
 
-If you use the `depth2mt` stage in a python script, you should use the class name:
+If you use the `depth2mt` stage in a python script, you should use its class name:
 
 ```python
 from pipelime.sequences import SamplesSequence
@@ -173,7 +173,7 @@ $ pipelime audit --config dags/anomalib_conf_template.yaml --context dags/to_ano
 
 The output file `dags/anomalib_conf.yaml` contains a `dataset` section for each category you can copy-and-paste to your Anomalib configuration file.
 
-To further customize the output, you can also set some variables in the context:
+To further customize the output, you can also set some other variables in the context:
 
 ```yaml
 anomalib:
