@@ -92,9 +92,9 @@ dimg = dimg / 65535.0 * (maxd - mind) + mind
 
 The [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo provides a ready-to-use **[Pipelime](https://github.com/eyecan-ai/pipelime-python) stage** to perform the conversion on-the-fly.
 
-</div>
-</div>
-
 # Conversion To Anomalib Data Format
 
 Do you want to use the data within the [Anomalib](https://github.com/openvinotoolkit/anomalib) framework? Checkout the [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo to find a ready-to-use converter!
+
+</div>
+</div>
