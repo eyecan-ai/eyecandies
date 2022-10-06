@@ -5,7 +5,7 @@ autoenc-predict:
   dataloader:
     batch_size: $var(predict.batch, default=32)
     shuffle: false
-    num_workers: $var(predict.num_workers, default=4)
+    num_workers: $var(predict.nproc, default=4)
     drop_last: false
     prefecth: $var(predict.prefetch, default=2)
   device: $var(predict.device, default=cuda)
