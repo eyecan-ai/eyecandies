@@ -7,7 +7,7 @@ layout: default
 <div class="hero has-text-centered" id="paper">
 <div class="myWrapper" markdown="1" align="left">
 
-**[The Eyecandies Dataset for Unsupervised Multimodal Anomaly Detection and Localization](#)**
+**[The Eyecandies Dataset for Unsupervised Multimodal Anomaly Detection and Localization](https://arxiv.org/abs/2210.04570)**
 
 ***Luca Bonfiglioli\*, Marco Toschi\*, Davide Silvestri, Nicola Fioraio, Daniele De Gregorio***<br>
 [Eyecan.ai](https://www.eyecan.ai/) *\* Equal contribution*
