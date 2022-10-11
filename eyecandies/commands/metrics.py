@@ -160,7 +160,7 @@ class ComputeMetricsCommand(PipelimeCommand, title="ec-metrics"):
 
     # OUTPUT
     output_folder: Path = Field(
-        ...,
+        Path("./"),
         alias="o",
         description=(
             "The folder where the output CSV file will be written. "
@@ -177,9 +177,12 @@ class ComputeMetricsCommand(PipelimeCommand, title="ec-metrics"):
     )
 
     # PARAMETERS
-    output_prefix: str = Field("", description="The prefix of the output CSV file.")
+    output_prefix: str = Field(
+        "", alias="op", description="The prefix of the output CSV file."
+    )
     heatmap_key: t.Optional[str] = Field(
         "heatmap",
+        alias="h",
         description=(
             "The key of the heatmap in the dataset. The pixel metrics will be computed "
             "by thresholding its values, while the maximum will be used to compute "
@@ -188,6 +191,7 @@ class ComputeMetricsCommand(PipelimeCommand, title="ec-metrics"):
     )
     anomaly_score_key: t.Optional[str] = Field(
         None,
+        alias="s",
         description=(
             "The key of the anomaly score in the dataset. If valid, it will be used "
             "to compute the image metrics, instead of the maximum value of the heatmap."
@@ -195,7 +199,7 @@ class ComputeMetricsCommand(PipelimeCommand, title="ec-metrics"):
     )
 
     mask_key: str = Field(
-        "mask", description="The key of the mask in the target dataset."
+        "mask", alias="m", description="The key of the mask in the target dataset."
     )
 
     nbins: t.Optional[PositiveInt] = Field(

@@ -6,7 +6,7 @@ autoenc-train:
   dataloader:
     batch_size: $var(training.batch, default=32)
     shuffle: true
-    num_workers: $var(training.num_workers, default=4)
+    num_workers: $var(training.nproc, default=4)
     drop_last: false
     prefecth: $var(training.prefetch, default=2)
   device: $var(training.device, default=cuda)

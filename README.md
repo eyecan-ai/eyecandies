@@ -88,7 +88,7 @@ We provide a naive auto-encoder implementation to train a model on the Eyecandie
 >
 > **This naive auto-encoder is not the one deployed in the paper and it is not meant to be used in practice!**
 
-Just create your context by copying `dags/ctx_template.yaml` and filling the missing variables, namely:
+Just create your own `tps_context.yaml` by copying `dags/tps_ctx_template.yaml` and filling the missing variables, namely:
 - `data.root`: the root folder of the Eyecandies dataset
 - `data.name`: the name of the category
 - `result_folder`: the output folder
@@ -128,4 +128,64 @@ As you can see, the pipeline is composed of three main steps:
 3. **ec-metrics**: ROC and AUROC are computed on the predictions using the public ground truth
 
 To get the results on any other method, just replace the first two nodes, then run **ec-metrics** on the new predictions. Note that results are given for the public test set only: to get the results on the private test set as well, please follow the instructions on the [Eyecandies website](https://eyecan-ai.github.io/eyecandies/).
- 
+
+## Metric Depth
+
+If you want to work with depth maps, you may want to convert them in meters.
+To do so, we provide a stage that can be run as:
+
+```bash
+$ pipelime -m eyecandies.stages map +s depth2mt +i path/to/eyecandies/dataset +o path/to/output/dataset
+```
+
+The output dataset has, for each sample, a `depth.npy` item, which is a float32 depth map in meters.
+Note that all other files are **hard-linked**, so no extra space is used.
+
+If you use the `depth2mt` stage in a python script, you should use its class name:
+
+```python
+from pipelime.sequences import SamplesSequence
+from eyecandies.stages import DepthToMetersStage
+
+seq = SamplesSequence.from_underfolder("path/to/eyecandies/dataset")
+seq = seq.map(DepthToMetersStage())
+```
+
+## Train And Testing With Anomalib
+
+[Anomalib](https://github.com/openvinotoolkit/anomalib) is a popular framework to benchmark anomaly detection algorithms. To train and test on Eyecandies, you should first rearrange your data. We provide a ready-to-use Pipelime dag to extract and split the files, you just have to create your own `to_anomalib_context.yaml` by copying `dags/to_anomalib_ctx_template.yaml` and filling the missing variables, namely:
+- `categories`: the list of categories to convert
+- `eyecandies_root`: the path to the Eyecandies dataset root folder
+- `output_root`: the path to the output dataset root folder
+- `image_key`: the key of the image item to use for anomalib, e.g., image_5
+
+Then run:
+
+```bash
+$ pipelime run --config dags/to_anomalib.yaml --context dags/to_anomalib_context.yaml
+```
+
+Pipelime can also create for you the `dataset` section of the configuration file required by Anomalib. Just run:
+
+```bash
+$ pipelime audit --config dags/anomalib_conf_template.yaml --context dags/to_anomalib_context.yaml -o dags/anomalib_conf.yaml
+```
+
+The output file `dags/anomalib_conf.yaml` contains a `dataset` section for each category you can copy-and-paste to your Anomalib configuration file.
+
+To further customize the output, you can also set some other variables in the context:
+
+```yaml
+anomalib:
+  image_size: 256
+  train_batch_size: 64
+  test_batch_size: 64
+  num_workers: 4
+  train_transform_config: null
+```
+
+or on the command line:
+
+```bash
+$ [...] @anomalib.image_size 256 @anomalib.train_batch_size 64 @anomalib.test_batch_size 64 @anomalib.num_workers 4 @anomalib.train_transform_config null
+```

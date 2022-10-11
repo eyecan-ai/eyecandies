@@ -10,7 +10,7 @@ layout: page
 
 The Eyecandies dataset can be used with [Pipelime](https://github.com/eyecan-ai/pipelime-python), an open-source python framework that provides tools to help you build automated data pipelines.
 
-Please refer to the [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo for info and examples on how to use and download the dataset using **Pipelime API**.
+Please refer to the [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo for more info and examples on how to use and download the dataset using the **Pipelime API**.
 
 ## Download (Manual)
 
@@ -66,7 +66,35 @@ Each dataset sample contains the following items:
 | `normals_mask` | GT segmentation mask for normal-type anomalies            | PNG GRAY 8-bit  | ❌            |
 | `mask`         | Pixel-wise or between all previous GT masks               | PNG GRAY 8-bit  | ❌            |
 
-\* Only "public" items are available in the private test set. Still, they are available for the others sets.
+\* Only "public" items are available in the private test set. Still, they are available for the other sets.
+
+# Depth Map De-Normalization
+
+To get the depth map in meters, you need to de-normalize it using the `info_depth` file.
+Here a sample code using plain python:
+
+```python
+import yaml
+import imageio.v3 as iio
+import numpy as np
+
+info_depth = "path/to/info_depth.yaml"
+depth = "path/to/depth.png"
+
+with open(info_depth) as f:
+    data = yaml.safe_load(f)
+mind, maxd = data["normalization"]["min"], data["normalization"]["max"]
+
+dimg = iio.imread(depth)
+dimg = dimg.astype(np.float32)
+dimg = dimg / 65535.0 * (maxd - mind) + mind
+```
+
+The [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo provides a ready-to-use **[Pipelime](https://github.com/eyecan-ai/pipelime-python) stage** to perform the conversion on-the-fly.
+
+# Conversion To Anomalib Data Format
+
+Do you want to use the data within the [Anomalib](https://github.com/openvinotoolkit/anomalib) framework? Checkout the [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo to find a ready-to-use converter!
 
 </div>
 </div>
