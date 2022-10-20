@@ -40,9 +40,13 @@ If you use this dataset in your research, please cite the following paper:
 
 ## Ten Object Classes
 
+<div markdown="1" style="overflow-x:scroll;">
+<div markdown="1" style="min-width:800px;">
+
 | Candy Cane                                                     | Chocolate Cookie                                                           | Chocolate Praline                                                            | Confetto                                                   | Gummy Bear                                                     |
 | -------------------------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------- |
 | ![Alt text](assets\images\objects\candy_cane.jpg "candy cane") | ![Alt text](assets\images\objects\chocolate_cookie.jpg "chocolate cookie") | ![Alt text](assets\images\objects\chocolate_praline.jpg "chocolate_praline") | ![Alt text](assets\images\objects\confetto.jpg "confetto") | ![Alt text](assets\images\objects\gummy_bear.jpg "gummy_bear") |
+
 
 <!-- this space is essential -->
 
@@ -50,14 +54,25 @@ If you use this dataset in your research, please cite the following paper:
 | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | ![Alt text](assets\images\objects\hazelnut_truffle.jpg "hazelnut_truffle") | ![Alt text](assets\images\objects\licorice_sandwich.jpg "licorice_sandwitch") | ![Alt text](assets\images\objects\lollipop.jpg "lollipop") | ![Alt text](assets\images\objects\marshmallow.jpg "marshmallow") | ![Alt text](assets\images\objects\peppermint_candy.jpg "peppermint candy") |
 
+</div>
+</div>
 
 ## Multi-Modal
+
+<div markdown="1" style="overflow-x:scroll;">
+<div markdown="1" style="min-width:600px;">
 
 | RGB                                                       | Depth                                                   | Normals                                                     |
 | --------------------------------------------------------- | ------------------------------------------------------- | ----------------------------------------------------------- |
 | ![Alt text](assets\images\multimodal\image_5.jpg "image") | ![Alt text](assets\images\multimodal\depth.jpg "depth") | ![Alt text](assets\images\multimodal\normals.jpg "normals") |
 
+</div>
+</div>
+
 ## Multi-Light
+
+<div markdown="1" style="overflow-x:scroll;">
+<div markdown="1" style="min-width:800px;">
 
 | All spotlights                                        | Bottom spot                                           | Right spot                                            | Top spot                                              | Left spot                                             | Global light box                                      |
 | ----------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------- |
@@ -67,23 +82,27 @@ If you use this dataset in your research, please cite the following paper:
 </div>
 </div>
 
+</div>
+</div>
+
 # LEADERBOARD
 
 <div class="hero" id="leaderboard" markdown="1">
+<div markdown="1" style="overflow-x: scroll;">
 <table>
     <tr>
-        <td><b>Method</b></td>
-        <td><b>Can. C.</b></td>
-        <td><b>Cho. C.</b></td>
-        <td><b>Cho. P.</b></td>
-        <td><b>Confet.</b></td>
-        <td><b>Gum. B.</b></td>
-        <td><b>Haz. T.</b></td>
-        <td><b>Lic. S.</b></td>
-        <td><b>Lollip.</b></td>
-        <td><b>Marsh.</b></td>
-        <td><b>Pep. C.</b></td>
-        <td><b>Avg.</b></td>
+        <td style="min-width:250px"><b>Method</b></td>
+        <td style="min-width:85px"><b>Can. C.</b></td>
+        <td style="min-width:85px"><b>Cho. C.</b></td>
+        <td style="min-width:85px"><b>Cho. P.</b></td>
+        <td style="min-width:85px"><b>Confet.</b></td>
+        <td style="min-width:90px"><b>Gum. B.</b></td>
+        <td style="min-width:85px"><b>Haz. T.</b></td>
+        <td style="min-width:85px"><b>Lic. S.</b></td>
+        <td style="min-width:85px"><b>Lollip.</b></td>
+        <td style="min-width:85px"><b>Marsh.</b></td>
+        <td style="min-width:85px"><b>Pep. C.</b></td>
+        <td style="min-width:85px"><b>Avg.</b></td>
     </tr>
     {% for method in site.data.leaderboard %}
         <tr>
@@ -95,6 +114,7 @@ If you use this dataset in your research, please cite the following paper:
         </tr>
     {% endfor %}
 </table>
+</div>
 
 <br>
 <div class="myWrapper" align="left" markdown="1">
