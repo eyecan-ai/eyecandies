@@ -43,16 +43,16 @@ If you use this dataset in your research, please cite the following paper:
 <div markdown="1" style="overflow-x:scroll;">
 <div markdown="1" style="min-width:800px;">
 
-| Candy Cane                                                     | Chocolate Cookie                                                           | Chocolate Praline                                                            | Confetto                                                   | Gummy Bear                                                     |
-| -------------------------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------- | -------------------------------------------------------------- |
-| ![Alt text](assets\images\objects\candy_cane.jpg "candy cane") | ![Alt text](assets\images\objects\chocolate_cookie.jpg "chocolate cookie") | ![Alt text](assets\images\objects\chocolate_praline.jpg "chocolate_praline") | ![Alt text](assets\images\objects\confetto.jpg "confetto") | ![Alt text](assets\images\objects\gummy_bear.jpg "gummy_bear") |
+| Candy Cane                                                      | Chocolate Cookie                                                            | Chocolate Praline                                                             | Confetto                                                    | Gummy Bear                                                      |
+| --------------------------------------------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------- | --------------------------------------------------------------- |
+| ![Alt text](assets\images\rgb_gifs\candy_cane.gif "candy cane") | ![Alt text](assets\images\rgb_gifs\chocolate_cookie.gif "chocolate cookie") | ![Alt text](assets\images\rgb_gifs\chocolate_praline.gif "chocolate_praline") | ![Alt text](assets\images\rgb_gifs\confetto.gif "confetto") | ![Alt text](assets\images\rgb_gifs\gummy_bear.gif "gummy_bear") |
 
 
 <!-- this space is essential -->
 
-| Hazelnut Truffle                                                           | Licorice Sandwich                                                             | Lollipop                                                   | Marshmallow                                                      | Peppermint Candy                                                           |
-| -------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| ![Alt text](assets\images\objects\hazelnut_truffle.jpg "hazelnut_truffle") | ![Alt text](assets\images\objects\licorice_sandwich.jpg "licorice_sandwitch") | ![Alt text](assets\images\objects\lollipop.jpg "lollipop") | ![Alt text](assets\images\objects\marshmallow.jpg "marshmallow") | ![Alt text](assets\images\objects\peppermint_candy.jpg "peppermint candy") |
+| Hazelnut Truffle                                                            | Licorice Sandwich                                                              | Lollipop                                                    | Marshmallow                                                       | Peppermint Candy                                                            |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------- | ----------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| ![Alt text](assets\images\rgb_gifs\hazelnut_truffle.gif "hazelnut_truffle") | ![Alt text](assets\images\rgb_gifs\licorice_sandwich.gif "licorice_sandwitch") | ![Alt text](assets\images\rgb_gifs\lollipop.gif "lollipop") | ![Alt text](assets\images\rgb_gifs\marshmallow.gif "marshmallow") | ![Alt text](assets\images\rgb_gifs\peppermint_candy.gif "peppermint candy") |
 
 </div>
 </div>
@@ -78,6 +78,23 @@ If you use this dataset in your research, please cite the following paper:
 | ----------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------- |
 | ![Alt text](assets\images\multilight\image_0.jpg "0") | ![Alt text](assets\images\multilight\image_1.jpg "1") | ![Alt text](assets\images\multilight\image_2.jpg "2") | ![Alt text](assets\images\multilight\image_3.jpg "3") | ![Alt text](assets\images\multilight\image_4.jpg "4") | ![Alt text](assets\images\multilight\image_5.jpg "5") |
 
+
+</div>
+</div>
+
+<div markdown="1" style="overflow-x:scroll;">
+<div markdown="1" style="min-width:800px;">
+
+| Candy Cane                                                        | Chocolate Cookie                                                              | Chocolate Praline                                                               | Confetto                                                      | Gummy Bear                                                        |
+| ----------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------- |
+| ![Alt text](assets\images\light_gifs\candy_cane.gif "candy cane") | ![Alt text](assets\images\light_gifs\chocolate_cookie.gif "chocolate cookie") | ![Alt text](assets\images\light_gifs\chocolate_praline.gif "chocolate_praline") | ![Alt text](assets\images\light_gifs\confetto.gif "confetto") | ![Alt text](assets\images\light_gifs\gummy_bear.gif "gummy_bear") |
+
+
+<!-- this space is essential -->
+
+| Hazelnut Truffle                                                              | Licorice Sandwich                                                                | Lollipop                                                      | Marshmallow                                                         | Peppermint Candy                                                              |
+| ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| ![Alt text](assets\images\light_gifs\hazelnut_truffle.gif "hazelnut_truffle") | ![Alt text](assets\images\light_gifs\licorice_sandwich.gif "licorice_sandwitch") | ![Alt text](assets\images\light_gifs\lollipop.gif "lollipop") | ![Alt text](assets\images\light_gifs\marshmallow.gif "marshmallow") | ![Alt text](assets\images\light_gifs\peppermint_candy.gif "peppermint candy") |
 
 </div>
 </div>
