@@ -45,13 +45,13 @@ You can find more information about Pipelime and its features in the [documentat
 For example, you can list the available *pipelime* commands in this package with:
 
 ```bash
-$ pipelime -m eyecandies list
+$ eyec list
 ```
 
 Then, to see the help for a specific command, e.g. `ec-get`:
 
 ```bash
-$ pipelime -m eyecandies help ec-get
+$ eyec help ec-get
 ```
 
 ## Download The Dataset
@@ -59,13 +59,13 @@ $ pipelime -m eyecandies help ec-get
 First, you should download the dataset. You can either get them one by one:
 
 ```bash
-$ pipelime -m eyecandies ec-get +o <output_root_folder> +c <category_name>
+$ eyec ec-get +o <output_root_folder> +c <category_name>
 ```
 
 or download all the categories at once:
 
 ```bash
-$ pipelime -m eyecandies ec-get +o <output_root_folder>
+$ eyec ec-get +o <output_root_folder>
 ```
 
 Already downloaded categories will be skipped, of course. Here a list of the available categories:
@@ -96,13 +96,13 @@ Just create your own `tps_context.yaml` by copying `dags/tps_ctx_template.yaml` 
 Then, run the full pipeline with:
 
 ```bash
-$ pipelime -m eyecandies run --config dags/train_predict_stats.yaml --context dags/context.yaml
+$ eyec run --config dags/train_predict_stats.yaml --context dags/context.yaml
 ```
 
 To understand what's going on, the pipeline can be drawn (you need `Graphviz` installed, see [Pipelime documentation](https://pipelime-python.readthedocs.io/en/latest/get_started/installation.html) for more info):
 
 ```bash
-$ pipelime -m eyecandies draw --config dags/train_predict_stats.yaml --context dags/context.yaml
+$ eyec draw --config dags/train_predict_stats.yaml --context dags/context.yaml
 ```
 
 ```mermaid
@@ -135,7 +135,7 @@ If you want to work with depth maps, you may want to convert them in meters.
 To do so, we provide a stage that can be run as:
 
 ```bash
-$ pipelime -m eyecandies.stages map +s depth2mt +i path/to/eyecandies/dataset +o path/to/output/dataset
+$ eyec -m eyecandies.stages map +s depth2mt +i path/to/eyecandies/dataset +o path/to/output/dataset
 ```
 
 The output dataset has, for each sample, a `depth.npy` item, which is a float32 depth map in meters.

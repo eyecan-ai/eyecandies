@@ -36,5 +36,8 @@ dependencies = [
 ]
 dynamic = [ "version" ]
 
+[project.scripts]
+eyec = "eyecandies:plmain"
+
 [tool.hatch.version]
 path = "eyecandies/__init__.py"
