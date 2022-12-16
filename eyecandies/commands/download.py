@@ -184,9 +184,9 @@ class GetEyecandiesCommand(EyecandiesDatasetInfo, title="ec-get"):
                 url = "https://docs.google.com" + m.groups()[0]
                 url = url.replace("&amp;", "&")
                 break
-            m = re.search('id="downloadForm" action="(.+?)"', line)
+            m = re.search('id="(downloadForm|download-form)" action="(.+?)"', line)
             if m:
-                url = m.groups()[0]
+                url = m.groups()[1]
                 url = url.replace("&amp;", "&")
                 break
             m = re.search('"downloadUrl":"([^"]+)', line)
