@@ -92,6 +92,95 @@ dimg = dimg / 65535.0 * (maxd - mind) + mind
 
 The [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo provides a ready-to-use **[Pipelime](https://github.com/eyecan-ai/pipelime-python) stage** to perform the conversion on-the-fly.
 
+
+# Depth Map To Pointcloud conversion
+
+A basic conversion from Depth to Pointcloud can be done by defining the camera projection matrix as an example in the following plain python snippet:
+
+```python
+# Camera parameters
+width, height, chan = image.shape
+fx = focal_length / sensor_size * width  
+fy = focal_length / sensor_size  * height  
+cx = width / 2
+cy = height / 2
+
+# intrinsics matrix
+intrinsics = np.array([[fx,0,cx],[0,fy,cy],[0,0,1]])
+intrinsics_4x4 =np.pad(intrinsics, (0, 1), 'constant') 
+intrinsics_4x4[3,3]=1
+
+# build the (u,v,1,1/depth) vectors
+depth_flatten = np.zeros((width*height,1))
+camera_vector = np.zeros((width*height,4)) 
+count=0
+for i in range(width):
+    for j in range(height):
+        camera_vector[count,:]=np.array([i,j,1,1/depth_raw[j,i]])
+        depth_flatten[count]=depth_raw[j,i]
+        count+=1
+
+# build the camera projection matrix
+camera_proj = intrinsics_4x4 @ pose
+
+# invert and apply to each 4-vector
+inverted_camera_proj= np.linalg.inv(camera_proj) @ camera_vector.T
+pc = depth_flatten * inverted_camera_proj.T
+```
+
+Note that the entire dataset have been acquired using a focal length of 50mm and a sensor size of 36mm, informations needed for evaluating the intrinsics matrix.
+
+To convert and visualize an RGB-D image directly to a ply pointcloud we also provide a stage `depth2pc` in the [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo.
+
+The following CLI shows how to use in sequence two pipelime stages on an eyecandies underfolder to convert an RGB-D dataset to a metric pointcloud and then visualize it with open3d.
+
+
+```python
+import numpy as np
+import open3d as o3d
+import typer
+from pathlib import Path
+from pipelime.sequences import SamplesSequence
+
+
+def main(
+    dataset_path: Path = typer.Option(..., help="Dataset with metric depth"),
+    key_point_cloud: str = typer.Option("pc", help="Pointcloud key on the underfolder"),
+    focal_length: int = 50,
+    sensor_size: int = 36,
+):
+
+    # Load the dataset (already converted to metric depths) with pipelime-python
+    seq = SamplesSequence.from_underfolder(dataset_path)
+
+    from eyecandies.stages import DepthToMetersStage,DepthToPCStage
+
+    seq = seq.map(DepthToMetersStage())
+    seq = seq.map(DepthToPCStage())
+
+    for sample in seq:
+        pcd = sample[key_point_cloud]()
+        # converting a trimesh pc(internal pipelime format) to o3d pc for viz 
+        pcd = DepthToPCStage.trimesh_to_o3d_pointcloud(pcd)
+        # scale for better visualization
+        pcd = pcd.scale(10, np.array([0.0, 0.0, 0.0]))
+        vis = o3d.visualization.Visualizer()
+        vis.create_window()
+        vis.add_geometry(pcd)
+        opt = vis.get_render_option()
+        opt.show_coordinate_frame = True
+        vis.run()
+        vis.destroy_window()
+
+if __name__ == "__main__":
+    typer.run(main)
+```
+ 
+Upon launching the above command you shall be able to visualize your colored pointcloud:
+
+
+![Alt text](assets\images\pc\point_cloud.gif "Candy Cane point cloud visualization")
+
 # Conversion To Anomalib Data Format
 
 Do you want to use the data within the [Anomalib](https://github.com/openvinotoolkit/anomalib) framework? Checkout the [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo to find a ready-to-use converter!

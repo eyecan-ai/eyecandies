@@ -5,4 +5,5 @@ from eyecandies.stages.anomaly_score import (
     ComputeMinMax,
 )
 from eyecandies.stages.depth import DepthToMetersStage
+from eyecandies.stages.depth import DepthToPCStage
 from eyecandies.stages.stats import ComputeStatsStage

@@ -151,6 +151,10 @@ seq = SamplesSequence.from_underfolder("path/to/eyecandies/dataset")
 seq = seq.map(DepthToMetersStage())
 ```
 
+## Metric depth to Point Cloud
+
+In case you may need to work on pointclouds we provided a stage `depth2pc` that can be used to extract a PC or to save a .ply to the underfolder. 
+
 ## Train And Testing With Anomalib
 
 [Anomalib](https://github.com/openvinotoolkit/anomalib) is a popular framework to benchmark anomaly detection algorithms. To train and test on Eyecandies, you should first rearrange your data. We provide a ready-to-use Pipelime dag to extract and split the files, you just have to create your own `to_anomalib_context.yaml` by copying `dags/to_anomalib_ctx_template.yaml` and filling the missing variables, namely:
