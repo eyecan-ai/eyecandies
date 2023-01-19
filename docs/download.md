@@ -78,106 +78,129 @@ import yaml
 import imageio.v3 as iio
 import numpy as np
 
-info_depth = "path/to/info_depth.yaml"
-depth = "path/to/depth.png"
 
-with open(info_depth) as f:
-    data = yaml.safe_load(f)
-mind, maxd = data["normalization"]["min"], data["normalization"]["max"]
+def load_and_convert_depth(depth_img, info_depth):
+    with open(info_depth) as f:
+        data = yaml.safe_load(f)
+    mind, maxd = data["normalization"]["min"], data["normalization"]["max"]
 
-dimg = iio.imread(depth)
-dimg = dimg.astype(np.float32)
-dimg = dimg / 65535.0 * (maxd - mind) + mind
+    dimg = iio.imread(depth_img)
+    dimg = dimg.astype(np.float32)
+    dimg = dimg / 65535.0 * (maxd - mind) + mind
+
+
+depth_meters = load_and_convert_depth("path/to/depth.png", "path/to/info_depth.yaml")
 ```
 
 The [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo provides a ready-to-use **[Pipelime](https://github.com/eyecan-ai/pipelime-python) stage** to perform the conversion on-the-fly.
 
 
-# Depth Map To Pointcloud conversion
+# Depth Map To Pointcloud Conversion
 
-A basic conversion from Depth to Pointcloud can be done by defining the camera projection matrix as an example in the following plain python snippet:
-
-```python
-# Camera parameters
-width, height, chan = image.shape
-fx = focal_length / sensor_size * width  
-fy = focal_length / sensor_size  * height  
-cx = width / 2
-cy = height / 2
-
-# intrinsics matrix
-intrinsics = np.array([[fx,0,cx],[0,fy,cy],[0,0,1]])
-intrinsics_4x4 =np.pad(intrinsics, (0, 1), 'constant') 
-intrinsics_4x4[3,3]=1
-
-# build the (u,v,1,1/depth) vectors
-depth_flatten = np.zeros((width*height,1))
-camera_vector = np.zeros((width*height,4)) 
-count=0
-for i in range(width):
-    for j in range(height):
-        camera_vector[count,:]=np.array([i,j,1,1/depth_raw[j,i]])
-        depth_flatten[count]=depth_raw[j,i]
-        count+=1
-
-# build the camera projection matrix
-camera_proj = intrinsics_4x4 @ pose
-
-# invert and apply to each 4-vector
-inverted_camera_proj= np.linalg.inv(camera_proj) @ camera_vector.T
-pc = depth_flatten * inverted_camera_proj.T
-```
-
-Note that the entire dataset have been acquired using a focal length of 50mm and a sensor size of 36mm, informations needed for evaluating the intrinsics matrix.
-
-To convert and visualize an RGB-D image directly to a ply pointcloud we also provide a stage `depth2pc` in the [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo.
-
-The following CLI shows how to use in sequence two pipelime stages on an eyecandies underfolder to convert an RGB-D dataset to a metric pointcloud and then visualize it with open3d.
-
+A basic conversion from Depth to Pointcloud can be done by defining the camera projection matrix as in the following plain python snippet:
 
 ```python
 import numpy as np
-import open3d as o3d
+
+def depth_to_pointcloud(depth_img, info_depth, pose_txt, focal_length):
+    # input depth map (in meters) --- cfr previous section
+    depth_mt = load_and_convert_depth(depth_img, info_depth)
+
+    # input pose
+    pose = np.loadtxt(pose_txt)
+
+    # camera intrinsics
+    height, width = depth_mt.shape[:2]
+    intrinsics_4x4 = np.array([
+        [focal_length, 0, width / 2, 0],
+        [0, focal_length, height / 2, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]]
+    )
+
+    # build the camera projection matrix
+    camera_proj = intrinsics_4x4 @ pose
+
+    # build the (u, v, 1, 1/depth) vectors (non optimized version)
+    camera_vectors = np.zeros((width * height, 4))
+    count=0
+    for j in range(height):
+        for i in range(width):
+            camera_vectors[count, :] = np.array([i, j, 1, 1/depth_mt[j, i]])
+            count += 1
+
+    # invert and apply to each 4-vector
+    hom_3d_pts= np.linalg.inv(camera_proj) @ camera_vectors.T
+
+    # remove the homogeneous coordinate
+    pcd = depth_mt.reshape(-1, 1) * hom_3d_pts.T
+    return pcd[:, :3]
+
+
+# The same camera has been used for all the images
+FOCAL_LENGTH = 711.11
+
+pc = depth_to_pointcloud(
+    "path/to/depth.png",
+    "path/to/info_depth.yaml",
+    "path/to/pose.txt",
+    FOCAL_LENGTH,
+)
+```
+
+To directly create a ply pointcloud with points, colors and normals,
+we also provide a **stage** `depth2pc` in the [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo.
+For example, the following snippet shows how to build a simple CLI to compute a show a metric pointcloud with open3d:
+
+```python
 import typer
+import numpy as np
+import open3d as o3d
 from pathlib import Path
+
 from pipelime.sequences import SamplesSequence
+
+from eyecandies.stages import DepthToMetersStage, DepthToPCStage
 
 
 def main(
-    dataset_path: Path = typer.Option(..., help="Dataset with metric depth"),
-    key_point_cloud: str = typer.Option("pc", help="Pointcloud key on the underfolder"),
-    focal_length: int = 50,
-    sensor_size: int = 36,
+    dataset_path: Path = typer.Option(..., help="Eyecandies Dataset"),
 ):
-
-    # Load the dataset (already converted to metric depths) with pipelime-python
+    # Load the dataset
     seq = SamplesSequence.from_underfolder(dataset_path)
 
-    from eyecandies.stages import DepthToMetersStage,DepthToPCStage
-
+    # Apply the stages
     seq = seq.map(DepthToMetersStage())
     seq = seq.map(DepthToPCStage())
 
+    # setup the open3d visualizer
+    vis = o3d.visualization.Visualizer()
+    vis.create_window()
+    opt = vis.get_render_option()
+    opt.show_coordinate_frame = True
+
     for sample in seq:
-        pcd = sample[key_point_cloud]()
-        # converting a trimesh pc(internal pipelime format) to o3d pc for viz 
-        pcd = DepthToPCStage.trimesh_to_o3d_pointcloud(pcd)
+        # get the pointcloud as trimesh object
+        pcd = sample["pcd"]()
+
+        # converting to open3d pointcloud
+        pcd = pcd.as_open3d()
+
         # scale for better visualization
         pcd = pcd.scale(10, np.array([0.0, 0.0, 0.0]))
-        vis = o3d.visualization.Visualizer()
-        vis.create_window()
+
+        # show the pointcloud
         vis.add_geometry(pcd)
-        opt = vis.get_render_option()
-        opt.show_coordinate_frame = True
         vis.run()
-        vis.destroy_window()
+        vis.remove_geometry(pcd)
+
+    vis.destroy_window()
 
 if __name__ == "__main__":
     typer.run(main)
 ```
- 
-Upon launching the above command you shall be able to visualize your colored pointcloud:
 
+Upon launching the above command you shall be able to visualize your colored pointclouds:
 
 ![Alt text](assets\images\pc\point_cloud.gif "Candy Cane point cloud visualization")
 

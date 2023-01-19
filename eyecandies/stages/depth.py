@@ -1,10 +1,8 @@
 import typing as t
+import numpy as np
 
 from pipelime.stages import SampleStage
 from pydantic import Field
-
-import numpy as np
-import trimesh
 
 if t.TYPE_CHECKING:
     from pipelime.sequences import Sample
@@ -35,7 +33,6 @@ class DepthToMetersStage(SampleStage, title="depth2mt"):
     )
 
     def __call__(self, x: "Sample") -> "Sample":
-        import numpy as np
         from pipelime.items import NpyNumpyItem
 
         mind = x.deep_get(self.mind_key_address)
@@ -58,78 +55,101 @@ class DepthToMetersStage(SampleStage, title="depth2mt"):
 
 
 class DepthToPCStage(SampleStage, title="depth2pc"):
-    """Converts floating point numpy array representing depth to pointcloud."""
+    """Converts a metric depth to pointcloud."""
 
     depth_key: str = Field(
-        "depth", description="The key of the input metric depth item."
+        "depth", description="The key of the input metric depth item"
     )
-    image_key: str = Field(
-        "image_0", description="The key of the input image to use to color the PC"
+    image_key: t.Optional[str] = Field(
+        "image_0",
+        description="The optional key of the input image to use to color the PC",
+    )
+    normals_key: t.Optional[str] = Field(
+        "normals", description="The optional key of the input normals"
     )
     pose_key: str = Field("pose", description="The key of the pose matrix")
-    focal_length: str = Field(50, description="The camera focal length [mm]")
-    sensor_size: str = Field(36, description="The sensor size [mm]")
-    out_pc_key: str = Field("pc", description="The key of the output pointcloud item.")
+    focal_length: float = Field(711.11, description="The camera focal length")
+    out_pcd_key: str = Field(
+        "pcd", description="The key of the output pointcloud item."
+    )
 
     def __call__(self, x: "Sample") -> "Sample":
-        import open3d as o3d
-        import pipelime.items as pli
+        import trimesh
+        from sklearn.preprocessing import normalize
+        from pipelime.items import PLYModel3DItem
 
-        # if self.depth_key not in x:
-        #     return x
+        if self.depth_key not in x:
+            return x
 
-        dimg: np.ndarray = x[self.depth_key]()
-        color: np.ndarray = x[self.image_key]()
-        extrinsics: np.ndarray = x[self.pose_key]()
+        pcd, valid_mask = self._depth_to_pointcloud(x)
 
-        width, height, _ = color.shape
-        fx = self.focal_length / self.sensor_size * width
-        fy = self.focal_length / self.sensor_size * height
-        cx = width / 2
-        cy = height / 2
+        if self.image_key is not None and self.image_key in x:
+            colors = x[self.image_key]()
+            colors = colors.reshape(-1, 3)[valid_mask]  # type: ignore
+            colors = np.hstack(
+                [colors, 255 * np.ones((colors.shape[0], 1), dtype=colors.dtype)]
+            )
+        else:
+            colors = None
 
-        rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-            o3d.geometry.Image(color),
-            o3d.geometry.Image(dimg),
-            convert_rgb_to_intensity=False,
+        if self.normals_key is not None and self.normals_key in x:
+            normals = x[self.normals_key]()
+            normals = normals.reshape(-1, 3)[valid_mask].astype(pcd.dtype)  # type: ignore
+            normals = normalize(normals / 127.5 - 1.0, norm="l2")
+
+            # normals towards the camera
+            cond = normals[:, 2] > 0  # type: ignore
+            normals[cond] *= -1  # type: ignore
+        else:
+            normals = None
+
+        # pipelime uses trimesh for 3D models
+        pcd = trimesh.Trimesh(
+            vertices=pcd, vertex_colors=colors, vertex_normals=normals
         )
 
-        # load intrinsics
-        intrinsics = o3d.camera.PinholeCameraIntrinsic()
-        intrinsics.set_intrinsics(width, height, fx, fy, cx, cy)
-
-        # Create pointcloud
-        pcd = o3d.geometry.PointCloud.create_from_rgbd_image(
-            image=rgbd_image, intrinsic=intrinsics, extrinsic=extrinsics
-        )
-        # Flip it, otherwise the pointcloud will be upside down.
-        pcd.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
-
-        # convert from open3d to trimesh geometry for pipelime item compatibility
-        pcd = self.o3d_to_trimesh_pointcloud(pcd)
-        x = x.set_item(self.out_pc_key, pli.PLYModel3DItem(pcd))
+        # set the pointcloud on the sample
+        x = x.set_item(self.out_pcd_key, PLYModel3DItem(pcd))
         return x
 
-    @staticmethod
-    def o3d_to_trimesh_pointcloud(o3d_pcd):
-        RGB = np.asarray(o3d_pcd.colors)
-        RGBA = np.concatenate(
-            [RGB, np.zeros((RGB.shape[0], 1)).astype("uint8")], axis=-1
+    def _depth_to_pointcloud(self, x: "Sample"):
+        depth_mt: np.ndarray = x[self.depth_key]()  # type: ignore
+        pose: np.ndarray = x[self.pose_key]()  # type: ignore
+
+        # camera intrinsics
+        height, width = depth_mt.shape[:2]
+        intrinsics_4x4 = np.array(
+            [
+                [self.focal_length, 0, width / 2, 0],
+                [0, self.focal_length, height / 2, 0],
+                [0, 0, 1, 0],
+                [0, 0, 0, 1],
+            ]
         )
-        pcd = trimesh.PointCloud(vertices=np.asarray(o3d_pcd.points), colors=RGBA)
 
-        return pcd
+        # build the camera projection matrix
+        camera_proj = intrinsics_4x4 @ pose
 
-    @staticmethod
-    def trimesh_to_o3d_pointcloud(trimesh_pcd):
-        import open3d as o3d
+        # build the (u, v, 1, 1/depth) vectors
+        flattened_depth = depth_mt.reshape(-1)
+        valid_mask = flattened_depth > 0
+        flattened_depth = flattened_depth[valid_mask]
 
-        o3d_points_vec = o3d.utility.Vector3dVector(np.asarray(trimesh_pcd.vertices))
-        # RGBA 2 RGB
-        o3d_colors_vec = o3d.utility.Vector3dVector(
-            np.asarray(trimesh_pcd.colors)[:, 0:3].astype("float64") / 255
+        xcoords = np.tile(np.arange(width, dtype=depth_mt.dtype), height)[valid_mask]
+        ycoords = np.repeat(np.arange(height, dtype=depth_mt.dtype), width)[valid_mask]
+        coord_grid = np.stack(
+            [
+                xcoords,
+                ycoords,
+                np.ones(xcoords.shape[0], dtype=depth_mt.dtype),
+                1.0 / flattened_depth,
+            ],
+            axis=0,
         )
-        print(np.asarray(o3d_points_vec))
-        pcd = o3d.geometry.PointCloud(points=o3d_points_vec)
-        pcd.colors = o3d_colors_vec
-        return pcd
+
+        # invert and apply to each 4-vector
+        hom_3d_pts = np.linalg.inv(camera_proj) @ coord_grid
+
+        # remove the homogeneous coordinate
+        pcd = flattened_depth.reshape(-1, 1) * hom_3d_pts.T
+        return pcd[:, :3], valid_mask

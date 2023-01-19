@@ -14,4 +14,4 @@ from eyecandies.commands.metrics import ComputeMetricsCommand
 def plmain():
     from pipelime.cli.main import run_with_extra_modules
 
-    run_with_extra_modules("eyecandies")
+    run_with_extra_modules("eyecandies", "eyecandies.stages")
