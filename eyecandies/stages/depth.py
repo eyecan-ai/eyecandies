@@ -16,11 +16,15 @@ class DepthToMetersStage(SampleStage, title="depth2mt"):
     )
     mind_key_address: str = Field(
         "info_depth.normalization.min",
-        description="The pydash address of the minimum depth value in the sample's item.",
+        description=(
+            "The pydash address of the minimum depth value in the sample's item."
+        ),
     )
     maxd_key_address: str = Field(
         "info_depth.normalization.max",
-        description="The pydash address of the maximum depth value in the sample's item.",
+        description=(
+            "The pydash address of the maximum depth value in the sample's item."
+        ),
     )
 
     use_float64: bool = Field(
@@ -29,7 +33,10 @@ class DepthToMetersStage(SampleStage, title="depth2mt"):
 
     out_depth_key_format: str = Field(
         "*",
-        description="The name of the item containing the output depth image. Any `*` will be replaced with the input item key.",
+        description=(
+            "The name of the item containing the output depth image. "
+            "Any `*` will be replaced with the input item key."
+        ),
     )
 
     def __call__(self, x: "Sample") -> "Sample":
@@ -94,8 +101,8 @@ class DepthToPCStage(SampleStage, title="depth2pc"):
 
         if self.normals_key is not None and self.normals_key in x:
             normals = x[self.normals_key]()
-            normals = normals.reshape(-1, 3)[valid_mask].astype(pcd.dtype)  # type: ignore
-            normals = normalize(normals / 127.5 - 1.0, norm="l2")
+            normals = normals.reshape(-1, 3)[valid_mask]  # type: ignore
+            normals = normalize(normals.astype(pcd.dtype) / 127.5 - 1.0, norm="l2")
 
             # normals towards the camera
             cond = normals[:, 2] > 0  # type: ignore
