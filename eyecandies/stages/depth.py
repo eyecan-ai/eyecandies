@@ -74,8 +74,13 @@ class DepthToPCStage(SampleStage, title="depth2pc"):
     normals_key: t.Optional[str] = Field(
         "normals", description="The optional key of the input normals"
     )
-    pose_key: str = Field("pose", description="The key of the pose matrix")
+    pose_key: t.Optional[str] = Field(
+        "pose", description="The optional key of the pose matrix"
+    )
     focal_length: float = Field(711.11, description="The camera focal length")
+    use_float64: bool = Field(
+        False, description="Whether to use 64-bit floats for points and normals."
+    )
     out_pcd_key: str = Field(
         "pcd", description="The key of the output pointcloud item."
     )
@@ -88,7 +93,7 @@ class DepthToPCStage(SampleStage, title="depth2pc"):
         if self.depth_key not in x:
             return x
 
-        pcd, valid_mask = self._depth_to_pointcloud(x)
+        pcd, valid_mask, pose = self._depth_to_pointcloud(x)
 
         if self.image_key is not None and self.image_key in x:
             colors = x[self.image_key]()
@@ -104,9 +109,15 @@ class DepthToPCStage(SampleStage, title="depth2pc"):
             normals = normals.reshape(-1, 3)[valid_mask]  # type: ignore
             normals = normalize(normals.astype(pcd.dtype) / 127.5 - 1.0, norm="l2")
 
+            # move to camera reference frame
+            # normals = normals @ pose[:3, :3]  # type: ignore
+
             # normals towards the camera
-            cond = normals[:, 2] > 0  # type: ignore
-            normals[cond] *= -1  # type: ignore
+            # cond = normals[:, 2] > 0  # type: ignore
+            # normals[cond] *= -1  # type: ignore
+
+            # move to world reference frame
+            normals = -normals @ pose[:3, :3].T  # type: ignore
         else:
             normals = None
 
@@ -121,7 +132,11 @@ class DepthToPCStage(SampleStage, title="depth2pc"):
 
     def _depth_to_pointcloud(self, x: "Sample"):
         depth_mt: np.ndarray = x[self.depth_key]()  # type: ignore
-        pose: np.ndarray = x[self.pose_key]()  # type: ignore
+
+        if self.pose_key is not None and self.pose_key in x:
+            pose: np.ndarray = x[self.pose_key]()  # type: ignore
+        else:
+            pose = np.eye(4)
 
         # camera intrinsics
         height, width = depth_mt.shape[:2]
@@ -133,9 +148,6 @@ class DepthToPCStage(SampleStage, title="depth2pc"):
                 [0, 0, 0, 1],
             ]
         )
-
-        # build the camera projection matrix
-        camera_proj = intrinsics_4x4 @ pose
 
         # build the (u, v, 1, 1/depth) vectors
         flattened_depth = depth_mt.reshape(-1)
@@ -154,9 +166,13 @@ class DepthToPCStage(SampleStage, title="depth2pc"):
             axis=0,
         )
 
-        # invert and apply to each 4-vector
-        hom_3d_pts = np.linalg.inv(camera_proj) @ coord_grid
+        # project and move to world reference frame
+        hom_3d_pts = pose @ np.linalg.inv(intrinsics_4x4) @ coord_grid
 
         # remove the homogeneous coordinate
         pcd = flattened_depth.reshape(-1, 1) * hom_3d_pts.T
-        return pcd[:, :3], valid_mask
+        return (
+            pcd[:, :3].astype(np.float64 if self.use_float64 else np.float32),
+            valid_mask,
+            pose,
+        )
