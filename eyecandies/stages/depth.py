@@ -108,16 +108,10 @@ class DepthToPCStage(SampleStage, title="depth2pc"):
             normals = x[self.normals_key]()
             normals = normals.reshape(-1, 3)[valid_mask]  # type: ignore
             normals = normalize(normals.astype(pcd.dtype) / 127.5 - 1.0, norm="l2")
-
-            # move to camera reference frame
-            # normals = normals @ pose[:3, :3]  # type: ignore
-
-            # normals towards the camera
-            # cond = normals[:, 2] > 0  # type: ignore
-            # normals[cond] *= -1  # type: ignore
-
             # move to world reference frame
-            normals = -normals @ pose[:3, :3].T  # type: ignore
+            normals = normals @ pose[:3, :3].T  # type: ignore
+            # Flip it, otherwise the normals will be upside down.
+            normals = normals @ [[1, 0, 0], [0, -1, 0], [0, 0, -1]]
         else:
             normals = None
 
