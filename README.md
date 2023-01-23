@@ -129,7 +129,7 @@ As you can see, the pipeline is composed of three main steps:
 
 To get the results on any other method, just replace the first two nodes, then run **ec-metrics** on the new predictions. Note that results are given for the public test set only: to get the results on the private test set as well, please follow the instructions on the [Eyecandies website](https://eyecan-ai.github.io/eyecandies/).
 
-## Metric Depth
+## Metric Depths And Pointclouds
 
 If you want to work with depth maps, you may want to convert them in meters.
 To do so, we provide a stage that can be run as:
@@ -150,6 +150,16 @@ from eyecandies.stages import DepthToMetersStage
 seq = SamplesSequence.from_underfolder("path/to/eyecandies/dataset")
 seq = seq.map(DepthToMetersStage())
 ```
+
+To project depth points to a pointcloud, we provide the stage `depth2pc` too.
+To run both stages in a row, you can use the `compose` builtin stage:
+
+```bash
+$ eyec map +i path/to/eyecandies/dataset +o path/to/output/dataset +stage.compose.stages[0] depth2mt +stage.compose.stages[1] depth2pc +g 4,10
+```
+
+where `+g 4,10` means that 4 processes will be spawned with a prefetch of 10 samples each.
+The default behavior is to save a PLY file with points, normals and colors.
 
 ## Train And Testing With Anomalib
 

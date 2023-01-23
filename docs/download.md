@@ -78,19 +78,168 @@ import yaml
 import imageio.v3 as iio
 import numpy as np
 
-info_depth = "path/to/info_depth.yaml"
-depth = "path/to/depth.png"
 
-with open(info_depth) as f:
-    data = yaml.safe_load(f)
-mind, maxd = data["normalization"]["min"], data["normalization"]["max"]
+def load_and_convert_depth(depth_img, info_depth):
+    with open(info_depth) as f:
+        data = yaml.safe_load(f)
+    mind, maxd = data["normalization"]["min"], data["normalization"]["max"]
 
-dimg = iio.imread(depth)
-dimg = dimg.astype(np.float32)
-dimg = dimg / 65535.0 * (maxd - mind) + mind
+    dimg = iio.imread(depth_img)
+    dimg = dimg.astype(np.float32)
+    dimg = dimg / 65535.0 * (maxd - mind) + mind
+    return dimg
+
+
+depth_meters = load_and_convert_depth("path/to/depth.png", "path/to/info_depth.yaml")
 ```
 
 The [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo provides a ready-to-use **[Pipelime](https://github.com/eyecan-ai/pipelime-python) stage** to perform the conversion on-the-fly.
+
+# Normals Map recovery
+
+Normals are saved as RGB images where each pixel maps the `(nx, ny, nz)` normal vector from `[-1, 1]` float to `[0, 255]` uint8 `(red, green, blue)`.
+Also, the reference frame has Z and Y flipped with respect to the camera reference frame,
+so you should account for it before moving to the world reference frame.
+Here a sample code in python:
+
+```python
+import imageio.v3 as iio
+import numpy as np
+
+
+def load_and_convert_normals(normal_img, pose_txt):
+    # input pose
+    pose = np.loadtxt(pose_txt)
+
+    # input normals
+    normals = iio.imread(normal_img).astype(float)
+    img_shape = normals.shape
+
+    # [0, 255] -> [-1, 1] and normalize
+    normals = normalize(normals / 127.5 - 1.0, norm="l2")
+
+    # flatten, flip Z and Y, then apply the pose
+    normals = normals.reshape(-1, 3) @ np.array([[1, 0, 0], [0, -1, 0], [0, 0, -1]])
+    normals = normals @ pose[:3, :3].T
+
+    # back to image, if needed
+    normals = normals.reshape(img_shape)
+    return normals
+
+
+normals = load_and_convert_normals("path/to/normals.png", "path/to/pose.txt")
+```
+
+The [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo provides a ready-to-use **[Pipelime](https://github.com/eyecan-ai/pipelime-python) stage** to compute the normals and the pointcloud.
+
+# Depth Map To Pointcloud Conversion
+
+A basic conversion from Depth to Pointcloud can be done by defining the camera projection matrix as in the following plain python snippet:
+
+```python
+import numpy as np
+
+def depth_to_pointcloud(depth_img, info_depth, pose_txt, focal_length):
+    # input depth map (in meters) --- cfr previous section
+    depth_mt = load_and_convert_depth(depth_img, info_depth)
+
+    # input pose
+    pose = np.loadtxt(pose_txt)
+
+    # camera intrinsics
+    height, width = depth_mt.shape[:2]
+    intrinsics_4x4 = np.array([
+        [focal_length, 0, width / 2, 0],
+        [0, focal_length, height / 2, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]]
+    )
+
+    # build the camera projection matrix
+    camera_proj = intrinsics_4x4 @ pose
+
+    # build the (u, v, 1, 1/depth) vectors (non optimized version)
+    camera_vectors = np.zeros((width * height, 4))
+    count=0
+    for j in range(height):
+        for i in range(width):
+            camera_vectors[count, :] = np.array([i, j, 1, 1/depth_mt[j, i]])
+            count += 1
+
+    # invert and apply to each 4-vector
+    hom_3d_pts= np.linalg.inv(camera_proj) @ camera_vectors.T
+
+    # remove the homogeneous coordinate
+    pcd = depth_mt.reshape(-1, 1) * hom_3d_pts.T
+    return pcd[:, :3]
+
+
+# The same camera has been used for all the images
+FOCAL_LENGTH = 711.11
+
+pc = depth_to_pointcloud(
+    "path/to/depth.png",
+    "path/to/info_depth.yaml",
+    "path/to/pose.txt",
+    FOCAL_LENGTH,
+)
+```
+
+To directly create a ply pointcloud with points, colors and normals,
+we also provide a **stage** `depth2pc` in the [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo.
+For example, the following snippet shows how to build a simple CLI to compute a show a metric pointcloud with open3d:
+
+```python
+import typer
+import numpy as np
+import open3d as o3d
+from pathlib import Path
+
+from pipelime.sequences import SamplesSequence
+
+from eyecandies.stages import DepthToMetersStage, DepthToPCStage
+
+
+def main(
+    dataset_path: Path = typer.Option(..., help="Eyecandies Dataset"),
+):
+    # Load the dataset
+    seq = SamplesSequence.from_underfolder(dataset_path)
+
+    # Apply the stages
+    seq = seq.map(DepthToMetersStage())
+    seq = seq.map(DepthToPCStage())
+
+    # setup the open3d visualizer
+    vis = o3d.visualization.Visualizer()
+    vis.create_window()
+    opt = vis.get_render_option()
+    opt.show_coordinate_frame = True
+
+    for sample in seq:
+        # get the pointcloud as trimesh object
+        pcd = sample["pcd"]()
+
+        # converting to open3d pointcloud
+        pcd = pcd.as_open3d()
+
+        # scale for better visualization
+        pcd = pcd.scale(10, np.array([0.0, 0.0, 0.0]))
+
+        # show the pointcloud
+        vis.add_geometry(pcd)
+        vis.run()
+        vis.remove_geometry(pcd)
+
+    vis.destroy_window()
+
+if __name__ == "__main__":
+    typer.run(main)
+```
+
+Upon launching the above command you shall be able to visualize your colored pointclouds:
+
+![Alt text](assets\images\pc\point_cloud.gif "Candy Cane point cloud visualization")
 
 # Conversion To Anomalib Data Format
 

@@ -30,11 +30,15 @@ keywords = [
 ]
 dependencies = [
     "pipelime-python",
+]
+dynamic = [ "version" ]
+
+[project.optional-dependencies]
+torch = [
     "torch",
     "torchvision",
     "torchmetrics",
 ]
-dynamic = [ "version" ]
 
 [project.scripts]
 eyec = "eyecandies:plmain"
