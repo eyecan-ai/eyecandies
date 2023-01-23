@@ -29,7 +29,7 @@ keywords = [
     "eyecandies", "dataset", "anomaly detection", "pipelime"
 ]
 dependencies = [
-    "pipelime-python",
+    "pipelime-python>=1.1.0",
 ]
 dynamic = [ "version" ]
 
@@ -41,7 +41,7 @@ torch = [
 ]
 
 [project.scripts]
-eyec = "eyecandies:plmain"
+eyec = "eyecandies:main"
 
 [tool.hatch.version]
 path = "eyecandies/__init__.py"

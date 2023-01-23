@@ -2,16 +2,13 @@
 
 __author__ = "Eyecan.ai"
 __email__ = "info@eyecan.ai"
-__version__ = "1.0.1"
-
-from eyecandies.commands.download import GetEyecandiesCommand
-from eyecandies.commands.train import TrainCommand
-from eyecandies.commands.test import TestCommand
-from eyecandies.commands.predict import PredictCommand
-from eyecandies.commands.metrics import ComputeMetricsCommand
+__version__ = "1.0.2"
 
 
-def plmain():
-    from pipelime.cli.main import run_with_extra_modules
+def main():
+    from pipelime.cli import PipelimeApp
 
-    run_with_extra_modules("eyecandies", "eyecandies.stages")
+    app = PipelimeApp(
+        "eyecandies.commands", "eyecandies.stages", app_version=__version__
+    )
+    app()

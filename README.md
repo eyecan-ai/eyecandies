@@ -19,15 +19,9 @@ This repository contains sample code to download and use the Eyecandies dataset 
 ## Get Started
 
 Installing the package brings in everything you need to download and use the Eyecandies dataset.
-However, it is better to first create a virtual environment and install `pytorch` following the instructions on the [official website](https://pytorch.org/get-started/locally/). For instance, to get `pytorch` 1.12.1 with `pip` and `venv` on Linux:
 
-```bash
-$ python3 -m venv <venv_path>
-$ source <venv_path>/bin/activate
-$ pip install torch==1.12.1 torchvision --extra-index-url https://download.pytorch.org/whl/cu116
-```
-
-Now you can get Eyecandies either directly from github:
+If you don't want to try the sample auto-encoder, you can simply install the package with pip,
+either directly from github:
 
 ```bash
 $ pip install git+https://github.com/eyecan-ai/eyecandies.git
@@ -38,6 +32,28 @@ or by cloning the repository and installing it locally:
 ```bash
 $ git clone https://github.com/eyecan-ai/eyecandies.git
 $ pip install -e eyecandies
+```
+
+Instead, to run the NN code you need `pytorch` and `torchvision`.
+First, create a virtual environment and install `pytorch` following the instructions on the [official website](https://pytorch.org/get-started/locally/). For instance, to get `pytorch` 1.12.1 with `pip` and `venv` on Linux:
+
+```bash
+$ python3 -m venv <venv_path>
+$ source <venv_path>/bin/activate
+$ pip install torch==1.12.1 torchvision --extra-index-url https://download.pytorch.org/whl/cu116
+```
+
+Now you can get Eyecandies with the `torch` flavor either directly from github:
+
+```bash
+$ pip install git+https://github.com/eyecan-ai/eyecandies.git[torch]
+```
+
+or by cloning the repository and installing it locally:
+
+```bash
+$ git clone https://github.com/eyecan-ai/eyecandies.git
+$ pip install -e eyecandies[torch]
 ```
 
 This package is built on top of [Pipelime](https://github.com/eyecan-ai/pipelime-python/).
