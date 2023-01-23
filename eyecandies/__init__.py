@@ -2,7 +2,7 @@
 
 __author__ = "Eyecan.ai"
 __email__ = "info@eyecan.ai"
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 
 def main():
