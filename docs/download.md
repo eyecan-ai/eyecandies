@@ -87,6 +87,7 @@ def load_and_convert_depth(depth_img, info_depth):
     dimg = iio.imread(depth_img)
     dimg = dimg.astype(np.float32)
     dimg = dimg / 65535.0 * (maxd - mind) + mind
+    return dimg
 
 
 depth_meters = load_and_convert_depth("path/to/depth.png", "path/to/info_depth.yaml")
@@ -94,6 +95,42 @@ depth_meters = load_and_convert_depth("path/to/depth.png", "path/to/info_depth.y
 
 The [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo provides a ready-to-use **[Pipelime](https://github.com/eyecan-ai/pipelime-python) stage** to perform the conversion on-the-fly.
 
+# Normals Map recovery
+
+Normals are saved as RGB images where each pixel maps the `(nx, ny, nz)` normal vector from `[-1, 1]` float to `[0, 255]` uint8 `(red, green, blue)`.
+Also, the reference frame has Z and Y flipped with respect to the camera reference frame,
+so you should account for it before moving to the world reference frame.
+Here a sample code in python:
+
+```python
+import imageio.v3 as iio
+import numpy as np
+
+
+def load_and_convert_normals(normal_img, pose_txt):
+    # input pose
+    pose = np.loadtxt(pose_txt)
+
+    # input normals
+    normals = iio.imread(normal_img).astype(float)
+    img_shape = normals.shape
+
+    # [0, 255] -> [-1, 1] and normalize
+    normals = normalize(normals / 127.5 - 1.0, norm="l2")
+
+    # flatten, flip Z and Y, then apply the pose
+    normals = normals.reshape(-1, 3) @ np.array([[1, 0, 0], [0, -1, 0], [0, 0, -1]])
+    normals = normals @ pose[:3, :3].T
+
+    # back to image, if needed
+    normals = normals.reshape(img_shape)
+    return normals
+
+
+normals = load_and_convert_normals("path/to/normals.png", "path/to/pose.txt")
+```
+
+The [Eyecandies](https://github.com/eyecan-ai/eyecandies) repo provides a ready-to-use **[Pipelime](https://github.com/eyecan-ai/pipelime-python) stage** to compute the normals and the pointcloud.
 
 # Depth Map To Pointcloud Conversion
 

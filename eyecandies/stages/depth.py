@@ -96,6 +96,11 @@ class DepthToPCStage(SampleStage, title="depth2pc"):
         pcd, valid_mask, pose = self._depth_to_pointcloud(x)
 
         if self.image_key is not None and self.image_key in x:
+            # [
+            #   [red_0, green_0, blue_0, alpha_0],
+            #   [red_1, green_1, blue_1, alpha_1],
+            #   ...
+            # ]
             colors = x[self.image_key]()
             colors = colors.reshape(-1, 3)[valid_mask]  # type: ignore
             colors = np.hstack(
@@ -105,13 +110,20 @@ class DepthToPCStage(SampleStage, title="depth2pc"):
             colors = None
 
         if self.normals_key is not None and self.normals_key in x:
+            # [
+            #   [nx_0, ny_0, nz_0],
+            #   [nx_1, ny_1, nz_1],
+            #   ...
+            # ]
             normals = x[self.normals_key]()
             normals = normals.reshape(-1, 3)[valid_mask]  # type: ignore
             normals = normalize(normals.astype(pcd.dtype) / 127.5 - 1.0, norm="l2")
+
+            # normals reference frame has  Z and Y flipped compared to the camera frame
+            normals = normals @ np.array([[1, 0, 0], [0, -1, 0], [0, 0, -1]])
+
             # move to world reference frame
             normals = normals @ pose[:3, :3].T  # type: ignore
-            # Flip it, otherwise the normals will be upside down.
-            normals = normals @ [[1, 0, 0], [0, -1, 0], [0, 0, -1]]
         else:
             normals = None
 
@@ -143,13 +155,22 @@ class DepthToPCStage(SampleStage, title="depth2pc"):
             ]
         )
 
-        # build the (u, v, 1, 1/depth) vectors
+        # [ depth_0, depth_1, ... ]
         flattened_depth = depth_mt.reshape(-1)
         valid_mask = flattened_depth > 0
         flattened_depth = flattened_depth[valid_mask]
 
+        # [ 0, 1, ..., width-1 ] repeated `height` times
         xcoords = np.tile(np.arange(width, dtype=depth_mt.dtype), height)[valid_mask]
+
+        # [ 0, ..., 0, 1, ..., 1, ..., height-1, ..., height-1 ]
+        # each element repeated `width` times
         ycoords = np.repeat(np.arange(height, dtype=depth_mt.dtype), width)[valid_mask]
+
+        # ┌      u0         ... ┐
+        # │      v0         ... │
+        # │       1         ... │
+        # └ 1/depth[v0, u0] ... ┘
         coord_grid = np.stack(
             [
                 xcoords,
@@ -160,10 +181,10 @@ class DepthToPCStage(SampleStage, title="depth2pc"):
             axis=0,
         )
 
-        # project and move to world reference frame
+        # project to 3D and move to world reference frame
         hom_3d_pts = pose @ np.linalg.inv(intrinsics_4x4) @ coord_grid
 
-        # remove the homogeneous coordinate
+        # remove the homogeneous coordinate and return
         pcd = flattened_depth.reshape(-1, 1) * hom_3d_pts.T
         return (
             pcd[:, :3].astype(np.float64 if self.use_float64 else np.float32),
